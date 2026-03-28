@@ -6,6 +6,7 @@ import BookingModal from "@/components/booking/BookingModal";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { X } from "lucide-react";
+import ClientsMarquee from "./ClientsMarquee";
 
 export default function HeroSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,8 +15,8 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen w-full flex flex-col items-center justify-start overflow-hidden bg-black selection:bg-yellow selection:text-navy">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      {/* Background Layer (Shifted up on portrait/folds/tablets) */}
+      <div className="absolute inset-0 z-0 transform xl:translate-y-0 -translate-y-[12%] scale-150 sm:scale-125 xl:scale-100 transition-transform duration-1000 pointer-events-none">
         <Image 
           src="/img.png" 
           alt="Cinematic background for BT Agency" 
@@ -23,8 +24,8 @@ export default function HeroSection() {
           priority
           className="object-cover object-center"
         />
-        {/* Subtle dark overlay for better text contrast if needed */}
-        <div className="absolute inset-0 bg-black/10 md:bg-black/20"></div>
+        {/* Subtle dark overlay */}
+        <div className="absolute inset-0 bg-black/10 xl:bg-black/20"></div>
       </div>
 
       {/* Top Gradient for Navbar blending */}
@@ -32,8 +33,8 @@ export default function HeroSection() {
 
       {/* The Cinema Screen positioned to fit the blank wall */}
       <div 
-        className="absolute z-10 top-[28%] sm:top-[26%] md:top-[22%] inset-x-0 mx-auto w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[63%] aspect-[21/9] flex flex-col items-center justify-center rounded-sm overflow-hidden shadow-[0_0_60px_rgba(255,238,52,0.15)] ring-1 ring-white/10 bg-black/80 transition-all duration-500"
-        style={{ perspective: "1000px" }}
+        className="absolute z-10 -translate-y-1/2 xl:top-[23%] xl:translate-y-0 inset-x-0 mx-auto w-full sm:w-[95%] xl:w-[60%] xl:aspect-[21/10] aspect-video flex flex-col items-center justify-center rounded-sm overflow-hidden shadow-[0_0_80px_rgba(255,238,52,0.2)] ring-1 ring-white/10 bg-black/80 transition-all duration-700"
+        style={{ perspective: "1000px", top: 'calc(20% + 20px)' }}
       >
         
         {/* Background Video */}
@@ -85,29 +86,45 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Astronaut Cutout Layer for 3D Depth (Must perfectly match the background sizing) */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
-        <Image 
-          src="/astronaut-cutout.png" 
-          alt="Astronaut cutout" 
-          fill
-          className="object-cover object-center"
-        />
+      {/* Astronaut Cutout Layer for 3D Depth (Must perfectly match the background sizing/transform) */}
+      <div className="absolute inset-0 z-20 transform xl:translate-y-0 -translate-y-[12%] scale-150 sm:scale-125 xl:scale-100 transition-transform duration-1000 pointer-events-none">
+          <Image 
+            src="/astronaut-cutout.png" 
+            alt="Astronaut cutout" 
+            fill
+            className="object-cover object-center"
+          />
       </div>
 
-      {/* Floating CTA Button */}
+      {/* Floating CTA Button & Client Logos (Mobile & Tablet) */}
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 1.5 }}
-        className="absolute bottom-6 sm:bottom-12 md:bottom-16 inset-x-0 mx-auto w-fit z-30"
-      >
+        className="absolute bottom-4 sm:bottom-12 md:bottom-16 inset-x-0 mx-auto w-full flex flex-col items-center gap-6 z-30"      >
         <button 
           onClick={() => setIsModalOpen(true)}
           className="bg-yellow text-navy px-6 py-3 sm:px-8 sm:py-4 rounded-md font-bold text-sm sm:text-base md:text-lg shadow-[0_0_30px_rgba(255,238,52,0.4)] hover:shadow-[0_0_50px_rgba(255,238,52,0.8)] hover:scale-105 transition-all duration-300 uppercase tracking-widest"
         >
           {t("hero.book_button")}
         </button>
+
+        {/* Minimal Logos Row for Mobile & Tablet Viewports */}
+        <div className="w-full xl:hidden py-3 bg-black/40 backdrop-blur-md border-y border-white/10 overflow-hidden">
+           <div className="flex gap-10 animate-marquee whitespace-nowrap px-4">
+              {["00", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((i) => (
+                <div key={i} className="relative w-20 h-14 opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all flex-shrink-0">
+                  <Image src={`/our_clients/${i}.png`} alt={`Client ${i}`} fill sizes="80px" className="object-contain" />
+                </div>
+              ))}
+              {/* Duplicate for infinite marquee */}
+              {["00", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((i) => (
+                <div key={`dup-${i}`} className="relative w-20 h-14 opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all flex-shrink-0">
+                  <Image src={`/our_clients/${i}.png`} alt={`Client ${i}`} fill sizes="80px" className="object-contain" />
+                </div>
+              ))}
+           </div>
+        </div>
       </motion.div>
 
       <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
