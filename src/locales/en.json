@@ -1,0 +1,39 @@
+{
+  "nav": {
+    "home": "Home",
+    "works": "Works",
+    "pricing": "Pricing",
+    "bts": "BTS",
+    "teamwork": "Teamwork",
+    "about": "About Us",
+    "careers": "Careers",
+    "contact": "Contact",
+    "switch_ar": "Switch to Arabic",
+    "switch_en": "Switch to English"
+  },
+  "hero": {
+    "title": "our work",
+    "subtitle": "We Innovate Your Vision",
+    "book_button": "Book Your Cinematic Ad"
+  },
+  "booking": {
+    "fullname": "Full Name",
+    "email": "Email",
+    "mobile": "Mobile",
+    "date": "Select Date",
+    "meeting_type": "Meeting Type",
+    "phone": "Phone Call",
+    "onsite": "On-site",
+    "zoom": "Zoom",
+    "confirm": "Confirm Booking",
+    "title": "Book Your Space",
+    "subtitle": "Reserve a slot for our cinematic onboarding"
+  },
+  "footer": {
+    "description": "We Innovate Your Vision. High-end cinematic production for brands seeking perfection.",
+    "navigation": "Navigation",
+    "connect": "Connect",
+    "rights": "All rights reserved.",
+    "slogan": "Crafted for the big screen."
+  }
+}
