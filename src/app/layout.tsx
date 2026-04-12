@@ -16,8 +16,8 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "BT ADV - We Innovate Your Vision",
-  description: "BT Advertising Agency - Premium Media Production",
+  title: "BT-ADV - We Innovate Your Vision",
+  description: "BT-ADV - Premium Media Production",
 };
 
 export default function RootLayout({

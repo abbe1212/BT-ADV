@@ -19,7 +19,15 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/store": ["./src/store"],
+      "@/store/*": ["./src/store/*"],
+      "@/types": ["./src/types"],
+      "@/types/*": ["./src/types/*"],
+      "@/lib/schemas": ["./src/lib/schemas"],
+      "@/lib/schemas/*": ["./src/lib/schemas/*"],
+      "@/lib/supabase/admin": ["./src/lib/supabase/admin"],
+      "@/lib/supabase/admin/*": ["./src/lib/supabase/admin/*"]
     }
   },
   "include": [

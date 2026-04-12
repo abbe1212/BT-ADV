@@ -16,7 +16,7 @@ export default function Footer() {
           <Link href="/" className="inline-flex items-center gap-4 hover:opacity-80 transition-opacity w-fit">
             <Image 
               src="/logo.png" 
-              alt="BT Advertising Agency" 
+              alt="BT-ADV" 
               width={250} 
               height={100} 
               quality={100}
@@ -81,7 +81,7 @@ export default function Footer() {
       </div>
 
       <div className="w-full max-w-7xl border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-white/40 uppercase tracking-widest gap-4">
-        <p>© {new Date().getFullYear()} BT Advertising Agency. {t("footer.rights")}</p>
+        <p>© {new Date().getFullYear()} BT-ADV. {t("footer.rights")}</p>
         <p>{t("footer.slogan")}</p>
       </div>
     </footer>

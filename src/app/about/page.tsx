@@ -1,12 +1,19 @@
 import Navbar from "@/components/layout/Navbar";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import { getSiteSettings } from "@/lib/supabase/queries";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  const heroImage = settings.about_hero_image || '/images/about-hero.jpg';
+
   return (
     <main className="min-h-screen bg-navy text-white flex flex-col items-center pb-20">
       <Navbar />
 
-      <div className="w-full relative mt-24 py-20 bg-[url('https://www.w3schools.com/w3images/lights.jpg')] bg-cover bg-center">
+      <div 
+        className="w-full relative mt-24 py-20 bg-cover bg-center"
+        style={{ backgroundImage: `url('${heroImage}')` }}
+      >
         <div className="absolute inset-0 bg-navy/80 backdrop-blur-sm"></div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-[fantasy] mb-6 drop-shadow-lg">

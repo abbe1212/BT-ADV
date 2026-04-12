@@ -1,0 +1,75 @@
+import React from "react";
+import Link from "next/link";
+import { CalendarDays, Phone, Video, MapPin, LucideIcon } from "lucide-react";
+import type { Booking } from "@/lib/supabase/types";
+import { BookingStatusBadge } from "@/components/admin/bookings/BookingStatusBadge";
+
+const typeIcons: Record<string, LucideIcon> = {
+  phone: Phone,
+  zoom: Video,
+  onsite: MapPin,
+};
+
+export function RecentBookingsWidget({ bookings }: { bookings: Booking[] }) {
+  return (
+    <div className="lg:col-span-7 xl:col-span-8 bg-[#0A1F33] rounded-xl border border-[#14304A] p-5 flex flex-col">
+      <div className="flex justify-between items-end mb-4">
+        <div>
+          <h2 className="text-lg font-bold text-white mb-1">Recent Bookings</h2>
+          <p className="text-xs text-white/50 uppercase tracking-wide">أحدث الحجوزات</p>
+        </div>
+        <Link href="/admin/bookings" className="text-sm text-[#FFEE34] hover:underline font-semibold">
+          View All
+        </Link>
+      </div>
+
+      <div className="overflow-x-auto">
+        {bookings.length === 0 ? (
+          <div className="text-center py-12 text-white/50">
+            <CalendarDays className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p>No bookings yet</p>
+          </div>
+        ) : (
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-white/60 uppercase bg-[#061520] border-y border-[#14304A]">
+              <tr>
+                <th className="px-4 py-3 font-medium">Ref</th>
+                <th className="px-4 py-3 font-medium">Client</th>
+                <th className="px-4 py-3 font-medium">Date</th>
+                <th className="px-4 py-3 font-medium">Type</th>
+                <th className="px-4 py-3 font-medium">Budget</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#14304A]">
+              {bookings.map((booking) => {
+                const TypeIcon = typeIcons[booking.type] || Phone;
+                const typeLabel = booking.type === 'phone' ? 'Phone Call' : booking.type === 'onsite' ? 'On-Site' : 'Zoom';
+                return (
+                  <tr key={booking.ref_code} className="hover:bg-[#0d2538] transition-colors group relative">
+                    <td className="px-4 py-3 font-mono text-white/80 group-hover:text-white">
+                      <div className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-1 bg-[#FFEE34] transition-all shadow-[0_0_10px_#FFEE34]" />
+                      {booking.ref_code}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-white">{booking.name}</td>
+                    <td className="px-4 py-3 text-white/70">{booking.date}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5 text-white/70">
+                        <TypeIcon className="w-3.5 h-3.5" />
+                        <span>{typeLabel}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-white/70">{booking.estimated_budget?.toUpperCase() ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <BookingStatusBadge status={booking.status} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}

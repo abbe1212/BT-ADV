@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@supabase/ssr": "^0.10.0",
+    "@supabase/supabase-js": "^2.101.1",
+    "@tanstack/react-query": "^5.97.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.38.0",
@@ -21,8 +24,10 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.72.0",
     "resend": "^6.9.4",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

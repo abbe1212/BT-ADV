@@ -22,6 +22,7 @@ export default function Navbar() {
   const navLinks = [
     { name: t("nav.home"), href: "/" },
     { name: t("nav.works"), href: "/works" },
+    { name: t("nav.clients"), href: "/clients" },
     { name: t("nav.pricing"), href: "/pricing" },
     { name: t("nav.bts"), href: "/bts" },
     { name: t("nav.teamwork"), href: "/teamwork" },
@@ -41,14 +42,14 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Image 
             src="/logo.png" 
-            alt="BT Advertising Agency" 
+            alt="BT-ADV" 
             width={250} 
             height={100} 
             quality={100}
             className="object-contain h-12 w-auto md:h-16 lg:h-20"
           />
           <span className="text-xl md:text-2xl lg:text-1xl font-bold tracking-widest text-white uppercase hidden sm:block">
-            Band<span className="text-yellow">-</span>Trend
+            BT<span className="text-yellow">-</span>ADV
           </span>
         </Link>
 
