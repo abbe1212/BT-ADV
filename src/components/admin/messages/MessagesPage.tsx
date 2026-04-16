@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Mail, Search, Clock, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import type { ContactMessage } from "@/lib/supabase/types";
-import { markMessageAsRead, deleteMessage } from "@/lib/supabase/mutations";
+import { markMessageAsRead, deleteMessage } from "@/actions/messages";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

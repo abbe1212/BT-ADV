@@ -8,6 +8,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Calendar, User, Mail, Phone, Video, MapPin, PhoneCall, Loader2, Clock } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCsrfToken } from "@/lib/csrf-client";
 
 /* ─── Time slots available per day ─────────────────────────────────────────── */
 const ALL_TIME_SLOTS = [
@@ -93,7 +94,10 @@ export default function BookingForm({
 
       const res = await fetch("/api/booking", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": getCsrfToken(),
+        },
         body: JSON.stringify(payload),
       });
 

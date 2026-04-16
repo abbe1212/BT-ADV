@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Plus, Edit2, Trash2, X, Briefcase, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Career } from "@/lib/supabase/types";
-import { insertCareer, updateCareer, deleteCareer, type CareerInsert } from "@/lib/supabase/mutations";
+import { insertCareer, updateCareer, deleteCareer, type CareerInsert } from "@/actions/careers";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { ContactMessageInsert } from '@/lib/supabase/types';
 import * as z from 'zod';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyCsrfToken } from '@/lib/csrf';
 
 const schema = z.object({
   name:    z.string().min(2),
@@ -12,6 +14,28 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // ── CSRF verification ────────────────────────────────────────────────────
+    if (!verifyCsrfToken(req)) {
+      return NextResponse.json(
+        { error: 'Invalid or missing CSRF token.' },
+        { status: 403 }
+      );
+    }
+
+    // ── Rate limiting ────────────────────────────────────────────────────
+    // 3 submissions per IP per 5 minutes — prevents contact form spam.
+    const ip = getClientIp(req);
+    const rl = rateLimit(`contact:${ip}`, { limit: 3, windowMs: 5 * 60 * 1_000 });
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait before submitting again.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rl.retryAfter) },
+        }
+      );
+    }
+
     const body = await req.json();
     const parsed = schema.safeParse(body);
 

@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Booking } from "@/lib/supabase/types";
-import { updateBookingStatus, deleteBooking } from "@/lib/supabase/mutations";
+import { updateBookingStatus, deleteBooking } from "@/actions/bookings";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

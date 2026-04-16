@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Plus, GripVertical, Edit2, Trash2, X, Briefcase, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Service } from "@/lib/supabase/types";
-import { insertService, updateService, deleteService, type ServiceInsert } from "@/lib/supabase/mutations";
+import { insertService, updateService, deleteService, type ServiceInsert } from "@/actions/services";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

@@ -5,7 +5,7 @@ import { Plus, Edit2, Trash2, X, Star, Camera, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import type { TeamMember } from "@/lib/supabase/types";
-import { insertTeamMember, updateTeamMember, deleteTeamMember, type TeamMemberInsert } from "@/lib/supabase/mutations";
+import { insertTeamMember, updateTeamMember, deleteTeamMember, type TeamMemberInsert } from "@/actions/team";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

@@ -1,6 +1,26 @@
 /**
- * Admin Mutations Library
- * Client-side Supabase mutations for admin CRUD operations
+ * @deprecated
+ * ─────────────────────────────────────────────────────────────────────────────
+ * This file is NO LONGER USED by any admin component.
+ * All admin write operations have been migrated to Server Actions in:
+ *   src/actions/works.ts
+ *   src/actions/team.ts
+ *   src/actions/pricing.ts
+ *   src/actions/services.ts
+ *   src/actions/careers.ts
+ *   src/actions/bts.ts
+ *   src/actions/clients.ts
+ *   src/actions/reviews.ts
+ *   src/actions/bookings.ts
+ *   src/actions/messages.ts
+ *   src/actions/settings.ts
+ *
+ * Server Actions use createServerClient (authenticated session) instead of
+ * createBrowserClient (anon key), eliminating direct REST API attack surface.
+ *
+ * This file is kept temporarily as a safety reference. It can be safely
+ * deleted once the migration has been verified end-to-end.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { createClient } from './client';

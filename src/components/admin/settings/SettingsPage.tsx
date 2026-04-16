@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Check, AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { updateSiteSettings } from "@/lib/supabase/mutations";
+import { updateSiteSettings } from "@/actions/settings";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 

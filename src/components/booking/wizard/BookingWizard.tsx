@@ -5,6 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { getCsrfToken } from "@/lib/csrf-client";
 
 import StepIndicator from "./StepIndicator";
 import Step1Contact from "./Step1Contact";
@@ -85,7 +86,10 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
 
       const res = await fetch("/api/booking", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": getCsrfToken(),
+        },
         body: JSON.stringify(payload),
       });
 

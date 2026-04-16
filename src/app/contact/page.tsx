@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import { User, Mail, Phone, MessageSquare, MapPin, Loader2, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { getCsrfToken } from "@/lib/csrf-client";
 
 interface FormData {
   name: string;
@@ -30,7 +31,10 @@ export default function ContactPage() {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": getCsrfToken(),
+        },
         body: JSON.stringify(form),
       });
 

@@ -1,4 +1,6 @@
 import { createClient } from './server';
+import { createAnonClient } from './anon-client';
+import { unstable_cache } from 'next/cache';
 import type {
   Work, Pricing, Service, BtsItem, TeamMember,
   Career, ClientLogo, SiteSetting, BookingInsert, ContactMessageInsert,
@@ -7,8 +9,8 @@ import type {
 
 // ─── works ────────────────────────────────────────────────────────────────────
 
-export async function getWorks(category?: string): Promise<Work[]> {
-  const supabase = await createClient();
+const _getWorks = async (category?: string): Promise<Work[]> => {
+  const supabase = createAnonClient();
   let query = supabase
     .from('works')
     .select('*, clients(*)')
@@ -21,7 +23,17 @@ export async function getWorks(category?: string): Promise<Work[]> {
   const { data, error } = await query;
   if (error) { console.error('[getWorks]', error.message); return []; }
   return data as Work[];
-}
+};
+
+/**
+ * Public portfolio works, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('works')`
+ */
+export const getWorks = unstable_cache(
+  _getWorks,
+  ['works'],
+  { revalidate: 3600, tags: ['works'] }
+);
 
 export interface GetAdminWorksFilters {
   limit?: number;
@@ -72,29 +84,33 @@ export async function getWorkById(id: string): Promise<Work | null> {
   return data as Work;
 }
 
+/**
+ * Returns the next work in order for carousel/navigation.
+ * Fixed: uses maybeSingle() + parallel first-work fallback to eliminate
+ * the previous sequential two-query waterfall.
+ */
 export async function getNextWork(currentOrderIndex: number): Promise<Work | null> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('works')
-    .select('*')
-    .gt('order_index', currentOrderIndex)
-    .order('order_index', { ascending: true })
-    .limit(1)
-    .single();
 
-  if (error) {
-    // If no next work, get the first one (loop around)
-    const { data: firstData, error: firstError } = await supabase
+  // Fetch the next work AND the first work (fallback) in parallel.
+  const [nextResult, firstResult] = await Promise.all([
+    supabase
+      .from('works')
+      .select('*')
+      .gt('order_index', currentOrderIndex)
+      .order('order_index', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabase
       .from('works')
       .select('*')
       .order('order_index', { ascending: true })
       .limit(1)
-      .single();
-    
-    if (firstError) return null;
-    return firstData as Work;
-  }
-  return data as Work;
+      .maybeSingle(),
+  ]);
+
+  // Use next work if found, otherwise loop around to first work.
+  return (nextResult.data ?? firstResult.data) as Work | null;
 }
 
 export async function getFeaturedWorks(): Promise<Work[]> {
@@ -111,8 +127,8 @@ export async function getFeaturedWorks(): Promise<Work[]> {
 
 // ─── pricing ──────────────────────────────────────────────────────────────────
 
-export async function getPricing(): Promise<Record<string, Pricing[]>> {
-  const supabase = await createClient();
+const _getPricing = async (): Promise<Record<string, Pricing[]>> => {
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('pricing')
     .select('*')
@@ -126,12 +142,22 @@ export async function getPricing(): Promise<Record<string, Pricing[]>> {
     acc[item.category].push(item);
     return acc;
   }, {});
-}
+};
+
+/**
+ * Pricing table grouped by category, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('pricing')`
+ */
+export const getPricing = unstable_cache(
+  _getPricing,
+  ['pricing'],
+  { revalidate: 3600, tags: ['pricing'] }
+);
 
 // ─── services ─────────────────────────────────────────────────────────────────
 
-export async function getServices(): Promise<Service[]> {
-  const supabase = await createClient();
+const _getServices = async (): Promise<Service[]> => {
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('services')
     .select('*')
@@ -139,7 +165,17 @@ export async function getServices(): Promise<Service[]> {
 
   if (error) { console.error('[getServices]', error.message); return []; }
   return data as Service[];
-}
+};
+
+/**
+ * Public services list, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('services')`
+ */
+export const getServices = unstable_cache(
+  _getServices,
+  ['services'],
+  { revalidate: 3600, tags: ['services'] }
+);
 
 // ─── bts ──────────────────────────────────────────────────────────────────────
 
@@ -211,25 +247,30 @@ export async function getClientBySlug(slug: string): Promise<Client | null> {
   return data as Client;
 }
 
+/**
+ * Fetches a client + their related works and reviews in a single
+ * PostgREST nested-select (1 round-trip instead of 3).
+ * Fixed: was client → [works, reviews] = 2 sequential steps total;
+ * now sends 1 request and decomposes the joined payload on the server.
+ */
 export async function getClientWithRelations(slug: string): Promise<{ client: Client, works: Work[], reviews: Review[] } | null> {
   const supabase = await createClient();
-  const { data: client, error: clientErr } = await supabase
+  const { data, error } = await supabase
     .from('clients')
-    .select('*')
+    .select('*, works(*), reviews(*)')
     .eq('slug', slug)
+    .order('order_index', { referencedTable: 'works', ascending: true })
+    .order('order_index', { referencedTable: 'reviews', ascending: true })
     .single();
 
-  if (clientErr || !client) return null;
+  if (error || !data) return null;
 
-  const [{ data: works }, { data: reviews }] = await Promise.all([
-    supabase.from('works').select('*').eq('client_id', client.id).order('order_index', { ascending: true }),
-    supabase.from('reviews').select('*').eq('client_id', client.id).order('order_index', { ascending: true }),
-  ]);
+  const { works, reviews, ...client } = data as Client & { works: Work[]; reviews: Review[] };
 
   return {
     client: client as Client,
-    works: (works as Work[]) || [],
-    reviews: (reviews as Review[]) || [],
+    works: works || [],
+    reviews: reviews || [],
   };
 }
 
@@ -298,18 +339,27 @@ export async function getSiteSettings(): Promise<Record<string, string>> {
 
 // ─── bookings ─────────────────────────────────────────────────────────────────
 
-/** Returns already-booked time_slots for a given date string (YYYY-MM-DD) */
-export async function getBookedSlots(date: string): Promise<string[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('time_slot')
-    .eq('date', date)
-    .in('status', ['pending', 'confirmed']);
+/**
+ * Returns already-booked time_slots for a given date string (YYYY-MM-DD).
+ * Cached for 60 seconds to reduce DB hits from concurrent booking wizard users
+ * while still reflecting near-real-time availability.
+ * Revalidated on-demand via: `revalidateTag('booked-slots')`
+ */
+export const getBookedSlots = unstable_cache(
+  async (date: string): Promise<string[]> => {
+    const supabase = createAnonClient();
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('time_slot')
+      .eq('date', date)
+      .in('status', ['pending', 'confirmed']);
 
-  if (error) { console.error('[getBookedSlots]', error.message); return []; }
-  return (data as { time_slot: string }[]).map((r) => r.time_slot);
-}
+    if (error) { console.error('[getBookedSlots]', error.message); return []; }
+    return (data as { time_slot: string }[]).map((r) => r.time_slot);
+  },
+  ['booked-slots'],
+  { revalidate: 60, tags: ['booked-slots'] }
+);
 
 // ─── admin queries ────────────────────────────────────────────────────────────
 
@@ -358,25 +408,41 @@ export interface DashboardStats {
   bookingsByType: { phone: number; zoom: number; onsite: number };
 }
 
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createClient();
-  
-  // Get current month boundaries
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
 
-  // Parallel queries for stats
+  // Single RPC call — replaces 8 separate HTTP round-trips.
+  // The Postgres function aggregates all stats in one query execution.
+  // Run the SQL in supabase-security-fixes.sql to create this function.
+  const { data, error } = await supabase.rpc('get_dashboard_stats');
+
+  if (!error && data) {
+    return {
+      totalBookings:    data.total_bookings    ?? 0,
+      pendingBookings:  data.pending_bookings  ?? 0,
+      thisMonthBookings:data.this_month_bookings?? 0,
+      lastMonthBookings:data.last_month_bookings?? 0,
+      newMessages:      data.new_messages      ?? 0,
+      bookingsByType: {
+        phone:  data.phone_bookings  ?? 0,
+        zoom:   data.zoom_bookings   ?? 0,
+        onsite: data.onsite_bookings ?? 0,
+      },
+    };
+  }
+
+  // ── Fallback: RPC not yet deployed → run parallel queries ────────────────────
+  if (error) console.warn('[getDashboardStats] RPC not found, falling back:', error.message);
+
+  const now = new Date();
+  const startOfMonth    = new Date(now.getFullYear(), now.getMonth(),     1).toISOString();
+  const startOfLastMonth= new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+  const endOfLastMonth  = new Date(now.getFullYear(), now.getMonth(),     0).toISOString();
+
   const [
-    totalResult,
-    pendingResult,
-    thisMonthResult,
-    lastMonthResult,
-    messagesResult,
-    phoneResult,
-    zoomResult,
-    onsiteResult,
+    totalResult, pendingResult, thisMonthResult, lastMonthResult,
+    messagesResult, phoneResult, zoomResult, onsiteResult,
   ] = await Promise.all([
     supabase.from('bookings').select('*', { count: 'exact', head: true }),
     supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -389,14 +455,14 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   ]);
 
   return {
-    totalBookings: totalResult.count ?? 0,
-    pendingBookings: pendingResult.count ?? 0,
+    totalBookings:     totalResult.count     ?? 0,
+    pendingBookings:   pendingResult.count   ?? 0,
     thisMonthBookings: thisMonthResult.count ?? 0,
     lastMonthBookings: lastMonthResult.count ?? 0,
-    newMessages: messagesResult.count ?? 0,
+    newMessages:       messagesResult.count  ?? 0,
     bookingsByType: {
-      phone: phoneResult.count ?? 0,
-      zoom: zoomResult.count ?? 0,
+      phone:  phoneResult.count  ?? 0,
+      zoom:   zoomResult.count   ?? 0,
       onsite: onsiteResult.count ?? 0,
     },
   };

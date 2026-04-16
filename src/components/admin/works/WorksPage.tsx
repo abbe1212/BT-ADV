@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Plus, Image as ImageIcon, X, Search } from "lucide-react";
 import Image from "next/image";
 import type { Work } from "@/lib/supabase/types";
-import { deleteWork } from "@/lib/supabase/mutations";
+import { deleteWork } from "@/actions/works";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

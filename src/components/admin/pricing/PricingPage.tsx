@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Plus, GripVertical, Edit2, Trash2, X, Star, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Pricing } from "@/lib/supabase/types";
-import { insertPricing, updatePricing, deletePricing, type PricingInsert } from "@/lib/supabase/mutations";
+import { insertPricing, updatePricing, deletePricing, type PricingInsert } from "@/actions/pricing";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";

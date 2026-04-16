@@ -3,6 +3,8 @@ import { Resend } from 'resend';
 import { createClient } from '@/lib/supabase/server';
 import type { BookingInsert } from '@/lib/supabase/types';
 import * as z from 'zod';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyCsrfToken } from '@/lib/csrf';
 
 /* ─── Validation ─────────────────────────────────────────────────────────────*/
 const bookingSchema = z.object({
@@ -24,8 +26,15 @@ const bookingSchema = z.object({
 });
 
 /* ─── ref_code generator ─────────────────────────────────────────────────────*/
+/**
+ * Generates a collision-safe booking reference code using Node.js crypto.
+ * crypto.randomUUID() is RFC 4122 compliant and cryptographically random —
+ * guaranteed unique even under concurrent load, no external package required.
+ * Example output: BT-A3F9C12E
+ */
 function generateRefCode(): string {
-  return `BT-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 900 + 100)}`;
+  const unique = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase();
+  return `BT-${unique}`;
 }
 
 /* ─── Date formatter ─────────────────────────────────────────────────────────*/
@@ -137,6 +146,30 @@ function wrapEmail(body: string): string {
 /* ─── Route Handler ──────────────────────────────────────────────────────────*/
 export async function POST(req: Request) {
   try {
+    // ── CSRF verification ─────────────────────────────────────────────────────
+    // Blocks cross-origin form submissions. The client must read the
+    // `csrf-token` cookie (set by middleware) and echo it as X-CSRF-Token.
+    if (!verifyCsrfToken(req)) {
+      return NextResponse.json(
+        { error: 'Invalid or missing CSRF token.' },
+        { status: 403 }
+      );
+    }
+
+    // ── Rate limiting ─────────────────────────────────────────────────────────
+    // 5 booking attempts per IP per 10 minutes — prevents slot exhaustion & email abuse.
+    const ip = getClientIp(req);
+    const rl = rateLimit(`booking:${ip}`, { limit: 5, windowMs: 10 * 60 * 1_000 });
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait before submitting again.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rl.retryAfter) },
+        }
+      );
+    }
+
     const body = await req.json();
     const parsed = bookingSchema.safeParse(body);
 

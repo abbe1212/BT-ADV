@@ -5,7 +5,7 @@ import { X, Video, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import type { Work } from '@/lib/supabase/types';
-import { insertWork, updateWork, type WorkInsert } from '@/lib/supabase/mutations';
+import { insertWork, updateWork, type WorkInsert } from '@/actions/works';
 import { ImageUploadInput } from '@/components/ui/ImageUploadInput';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
