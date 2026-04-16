@@ -1,4 +1,4 @@
-import { getClients } from "@/lib/supabase/queries";
+import { getClients, getServices, getWorks, getFeaturedReviews } from "@/lib/supabase/queries";
 import BookingPageClient from "@/components/booking/BookingPageClient";
 
 export const metadata = {
@@ -7,7 +7,25 @@ export const metadata = {
 };
 
 export default async function BookingPage() {
-  const clients = await getClients();
+  // All 4 queries run in parallel; getServices & getWorks are cached for 1 hr
+  const [clients, services, works, reviews] = await Promise.all([
+    getClients(),
+    getServices(),
+    getWorks(),
+    getFeaturedReviews(),
+  ]);
 
-  return <BookingPageClient clientLogos={clients} />;
+  // Latest 5 works sorted by created_at desc
+  const latestWorks = [...works]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5);
+
+  return (
+    <BookingPageClient
+      clientLogos={clients}
+      services={services}
+      featuredWorks={latestWorks}
+      reviews={reviews}
+    />
+  );
 }

@@ -3,10 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { generateCsrfToken, CSRF_COOKIE } from '@/lib/csrf';
 
 export async function middleware(request: NextRequest) {
+  // ── Forward x-pathname so Server Component layouts can read it ───────────
+  // This is the recommended Next.js pattern for pathname-aware Server Components.
+  // Without this, layouts must be 'use client' just to call usePathname().
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+
   let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+    request: { headers: requestHeaders },
   });
 
   // ── CSRF cookie ───────────────────────────────────────────────────────────
@@ -37,12 +41,12 @@ export async function middleware(request: NextRequest) {
         },
         set(name: string, value: string, options: any) {
           request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({ request: { headers: request.headers } });
+          response = NextResponse.next({ request: { headers: requestHeaders } });
           response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: any) {
           request.cookies.set({ name, value: '', ...options });
-          response = NextResponse.next({ request: { headers: request.headers } });
+          response = NextResponse.next({ request: { headers: requestHeaders } });
           response.cookies.set({ name, value: '', ...options });
         },
       },

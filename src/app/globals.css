@@ -39,3 +39,23 @@ body {
   animation-play-state: paused;
 }
 
+/* ─── Star Field ──────────────────────────────────────────────────────────── */
+@keyframes starTwinkle {
+  0%   { opacity: var(--star-opacity, 0.4); transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.4); }
+}
+
+@keyframes shootingStar {
+  0%   { transform: translateX(0) rotate(-25deg); opacity: 0; }
+  5%   { opacity: 1; }
+  40%  { opacity: 0.6; }
+  60%  { opacity: 0; transform: translateX(110vw) rotate(-25deg); }
+  100% { transform: translateX(110vw) rotate(-25deg); opacity: 0; }
+}
+
+/* ─── Reviews Marquee ─────────────────────────────────────────────────── */
+@keyframes reviewsScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
