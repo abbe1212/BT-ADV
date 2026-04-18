@@ -9,17 +9,28 @@ import { getClients, getClientWithRelations } from "@/lib/supabase/queries";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
+// Allow slugs not pre-rendered at build time to be rendered on-demand
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  // Use native JS client to bypass cookies() requirement at build time
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  const { data } = await supabase.from('clients').select('slug');
-  return (data || []).map((client) => ({
-    slug: client.slug,
-  }));
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Guard: if env vars are missing at build time, return empty array.
+  // Pages will still be rendered on-demand at runtime via dynamicParams = true.
+  if (!url || !key) {
+    console.warn('[generateStaticParams] Supabase env vars missing — skipping static generation for /clients/[slug]');
+    return [];
+  }
+
+  try {
+    const supabase = createClient(url, key);
+    const { data } = await supabase.from('clients').select('slug');
+    return (data || []).map((client) => ({ slug: client.slug }));
+  } catch (err) {
+    console.warn('[generateStaticParams] Failed to fetch client slugs:', err);
+    return [];
+  }
 }
 
 interface Props {
