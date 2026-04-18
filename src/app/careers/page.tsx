@@ -4,6 +4,8 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { ArrowRight, Briefcase } from "lucide-react";
 import { getCareers } from "@/lib/supabase/queries";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Careers — BT ADV",
   description: "Join the BT ADV crew. Open positions for cinematic visionaries in Egypt.",

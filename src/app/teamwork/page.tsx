@@ -5,6 +5,8 @@ import Image from "next/image";
 import { getTeam } from "@/lib/supabase/queries";
 import { Users } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "The Crew — BT ADV",
   description: "Meet the brilliant minds behind BT Advertising Agency's cinematic productions.",

@@ -5,6 +5,8 @@ import { getBts } from "@/lib/supabase/queries";
 import { Camera } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Behind The Scenes — BT ADV",
   description: "Exclusive behind-the-scenes photos and videos from BT ADV productions.",

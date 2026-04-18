@@ -8,7 +8,7 @@ import ReviewsSection from "@/components/reviews/ReviewsSection";
 import { getClients, getClientWithRelations } from "@/lib/supabase/queries";
 import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 // Allow slugs not pre-rendered at build time to be rendered on-demand
 export const dynamicParams = true;
 

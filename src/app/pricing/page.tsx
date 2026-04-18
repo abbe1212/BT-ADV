@@ -5,6 +5,8 @@ import { Check, Star, Package } from "lucide-react";
 import { getPricing } from "@/lib/supabase/queries";
 import type { Pricing } from "@/lib/supabase/types";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Pricing — BT ADV",
   description: "Cinematic production packages including Creative Ads, Music Videos, and Marketing Reels.",

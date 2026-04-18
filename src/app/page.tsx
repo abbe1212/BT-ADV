@@ -4,6 +4,8 @@ import Navbar from "@/components/layout/Navbar";
 import ReviewsSection from "@/components/reviews/ReviewsSection";
 import { getClients, getFeaturedReviews } from "@/lib/supabase/queries";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [clients, featuredReviews] = await Promise.all([
     getClients(),

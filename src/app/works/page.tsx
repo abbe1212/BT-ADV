@@ -5,6 +5,8 @@ import { getWorks, getClients } from "@/lib/supabase/queries";
 import { Film } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Works — BT ADV",
   description: "Portfolio of cinematic TV commercials, digital ads, music videos and reel campaigns by BT Advertising Agency.",

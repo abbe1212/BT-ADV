@@ -2,6 +2,8 @@ import Navbar from "@/components/layout/Navbar";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import { getSiteSettings } from "@/lib/supabase/queries";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
   const settings = await getSiteSettings();
   const heroImage = settings.about_hero_image || '/images/about-hero.jpg';

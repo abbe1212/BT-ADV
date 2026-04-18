@@ -3,7 +3,7 @@ import ClientCard from "@/components/clients/ClientCard";
 import { getClients, getWorks } from "@/lib/supabase/queries";
 import { Users } from "lucide-react";
 
-export const revalidate = 3600; // Cache for 1 hour
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: "Our Clients — BT ADV",

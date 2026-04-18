@@ -1,6 +1,8 @@
 import { getClients, getServices, getWorks, getFeaturedReviews } from "@/lib/supabase/queries";
 import BookingPageClient from "@/components/booking/BookingPageClient";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Book Your Slot — BT ADV",
   description: "Schedule a consultation with BT Advertising Agency for your next cinematic production.",
