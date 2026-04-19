@@ -9,6 +9,7 @@ const INDUSTRIES = ["Real Estate", "F&B", "Tech", "Healthcare", "E-commerce", "E
 
 export default function Step2Company() {
   const { register, control, watch, setValue, formState: { errors } } = useFormContext<BookingWizardData>();
+
   
   const selectedPlatforms = watch("platforms") || [];
 
@@ -25,6 +26,18 @@ export default function Step2Company() {
       <div className="text-center mb-4">
         <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-[fantasy]">Company Brief</h2>
         <p className="text-white/50 text-sm mt-1">Tell us about your brand</p>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold uppercase tracking-widest text-white/80 flex items-center gap-2">
+          <Building size={16} /> Company Name *
+        </label>
+        <input
+          {...register("company_name")}
+          placeholder="e.g. BT Agency"
+          className="bg-black/50 border border-white/10 p-3 rounded-lg focus:border-yellow focus:ring-1 focus:ring-yellow outline-none transition-colors w-full text-white"
+        />
+        {errors.company_name && <p className="text-red-400 text-xs">{errors.company_name.message}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -62,10 +75,10 @@ export default function Step2Company() {
             className="bg-black/50 border border-white/10 p-3 rounded-lg focus:border-yellow focus:ring-1 focus:ring-yellow outline-none transition-colors w-full text-white appearance-none cursor-pointer"
           >
             <option value="">Select Audience...</option>
-            <option value="youth">Youth</option>
-            <option value="families">Families</option>
-            <option value="businesses">Businesses (B2B)</option>
-            <option value="general">General</option>
+            <option value="B2B">B2B</option>
+            <option value="B2C">B2C</option>
+            <option value="General">General</option>
+            <option value="Other">Other</option>
           </select>
         </div>
       </div>

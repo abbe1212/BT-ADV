@@ -8,21 +8,27 @@ import { verifyCsrfToken } from '@/lib/csrf';
 
 /* ─── Validation ─────────────────────────────────────────────────────────────*/
 const bookingSchema = z.object({
-  name:             z.string().min(2),
-  email:            z.string().email(),
-  phone:            z.string().min(5),
-  address:          z.string().optional(),
-  date:             z.string().regex(/^\d{4}-\d{2}-\d{2}$/),       // YYYY-MM-DD
-  time_slot:        z.string().regex(/^\d{2}:\d{2}$/),              // HH:MM
-  type:             z.enum(["phone", "onsite", "zoom"]),
-  estimated_budget: z.string().optional(),
-  company_brief:    z.string().optional(),
-  industry:         z.string().optional(),
-  has_brand_guide:  z.boolean().optional(),
-  previous_ads:     z.boolean().optional(),
-  target_audience:  z.enum(["youth", "families", "businesses", "general"]).optional(),
-  platforms:        z.array(z.string()).optional(),
-  notes:            z.string().optional(),
+  name:                z.string().min(2),
+  email:               z.string().email(),
+  phone:               z.string().min(5),
+  address:             z.string().optional(),
+  date:                z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),  // now optional
+  time_slot:           z.string().min(1),                                    // time range e.g. '10am-12pm'
+  type:                z.string().default('phone'),
+  estimated_budget:    z.string().optional(),
+  company_name:        z.string().optional(),
+  company_brief:       z.string().optional(),
+  industry:            z.string().optional(),
+  has_brand_guide:     z.boolean().optional(),
+  previous_ads:        z.boolean().optional(),
+  target_audience:     z.enum(['B2B', 'B2C', 'General', 'Other']).optional(),
+  platforms:           z.array(z.string()).optional(),
+  project_type:        z.string().optional(),
+  project_type_other:  z.string().optional(),
+  project_goal:        z.string().optional(),
+  project_goal_other:  z.string().optional(),
+  planning_start:      z.string().optional(),
+  notes:               z.string().optional(),
 });
 
 /* ─── ref_code generator ─────────────────────────────────────────────────────*/
@@ -180,7 +186,9 @@ export async function POST(req: Request) {
     const { 
       name, email, phone, address, 
       date, time_slot, type, estimated_budget,
-      company_brief, industry, has_brand_guide, previous_ads, target_audience, platforms, notes
+      company_name, company_brief, industry, has_brand_guide, previous_ads,
+      target_audience, platforms, notes,
+      project_type, project_type_other, project_goal, project_goal_other, planning_start
     } = parsed.data;
 
     // ── 1. Insert into Supabase ───────────────────────────────────────────────
@@ -190,18 +198,24 @@ export async function POST(req: Request) {
       name,
       email,
       phone,
-      address: address || undefined,
-      date,
+      address:             address || undefined,
+      date:                date || undefined,
       time_slot,
-      type,
-      estimated_budget: estimated_budget || undefined,
-      company_brief: company_brief || undefined,
-      industry: industry || undefined,
+      type:                type || 'phone',
+      estimated_budget:    estimated_budget || undefined,
+      company_name:        company_name || undefined,
+      company_brief:       company_brief || undefined,
+      industry:            industry || undefined,
       has_brand_guide,
       previous_ads,
-      target_audience: target_audience || undefined,
-      platforms: platforms || undefined,
-      notes: notes || undefined,
+      target_audience:     target_audience || undefined,
+      platforms:           platforms || undefined,
+      project_type:        project_type || undefined,
+      project_type_other:  project_type_other || undefined,
+      project_goal:        project_goal || undefined,
+      project_goal_other:  project_goal_other || undefined,
+      planning_start:      planning_start || undefined,
+      notes:               notes || undefined,
       status: 'pending',
     };
 
@@ -209,10 +223,6 @@ export async function POST(req: Request) {
     const { error: dbError } = await supabase.from('bookings').insert(payload);
 
     if (dbError) {
-      // Unique constraint (date, time_slot) violated
-      if (dbError.code === '23505') {
-        return NextResponse.json({ error: 'SLOT_TAKEN' }, { status: 409 });
-      }
       console.error('[POST /api/booking] DB error:', dbError.message);
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }

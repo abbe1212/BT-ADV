@@ -10,7 +10,8 @@ import { getCsrfToken } from "@/lib/csrf-client";
 import StepIndicator from "./StepIndicator";
 import Step1Contact from "./Step1Contact";
 import Step2Company from "./Step2Company";
-import Step3Meeting from "./Step3Meeting";
+import Step3ProjectDetails from "./Step3ProjectDetails";
+import Step4Meeting from "./Step4Meeting";
 
 const bookingSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -18,17 +19,24 @@ const bookingSchema = z.object({
   phone: z.string().min(10, "Invalid phone number"),
   address: z.string().optional(),
   
+  company_name: z.string().min(2, "Company name is required"),
   company_brief: z.string().optional(),
   industry: z.string().optional(),
   has_brand_guide: z.boolean().optional(),
   previous_ads: z.boolean().optional(),
-  target_audience: z.enum(["youth", "families", "businesses", "general"]).optional(),
+  target_audience: z.enum(["B2B", "B2C", "General", "Other"]).optional(),
   platforms: z.array(z.string()).optional(),
   
-  date: z.date(),
-  time_slot: z.string().min(1, "Please select a time slot"),
-  type: z.enum(["phone", "onsite", "zoom"], { error: "Please select a meeting type" }),
-  estimated_budget: z.enum(["300k", "500k", "600k", "1m"], { error: "Please select a budget" }),
+  project_type: z.string().min(1, "Please select a project type"),
+  project_type_other: z.string().optional(),
+  project_goal: z.string().min(1, "Please select a goal"),
+  project_goal_other: z.string().optional(),
+  planning_start: z.string().min(1, "Please select a timeline"),
+  
+  date: z.date().optional(),
+  time_slot: z.string().min(1, "Please select a preferred time"),
+  type: z.string().default("phone"),
+  estimated_budget: z.string().min(1, "Please enter your budget").refine(v => !isNaN(Number(v)) && Number(v) > 0, "Must be a valid positive number"),
   notes: z.string().optional(),
 });
 
@@ -60,7 +68,9 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
     if (currentStep === 1) {
       fieldsToValidate = ["name", "email", "phone"];
     } else if (currentStep === 2) {
-      fieldsToValidate = ["industry", "target_audience", "company_brief"];
+      fieldsToValidate = ["company_name", "industry", "target_audience", "company_brief"];
+    } else if (currentStep === 3) {
+      fieldsToValidate = ["project_type", "project_goal", "planning_start"];
     }
 
     const isStepValid = await trigger(fieldsToValidate);
@@ -81,7 +91,7 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
     try {
       const payload = {
         ...data,
-        date: data.date.toISOString().split("T")[0],
+        date: data.date ? data.date.toISOString().split("T")[0] : undefined,
       };
 
       const res = await fetch("/api/booking", {
@@ -114,7 +124,7 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
 
   return (
     <div className="w-full">
-      <StepIndicator currentStep={currentStep} totalSteps={3} />
+      <StepIndicator currentStep={currentStep} totalSteps={4} />
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 text-white w-full">
@@ -122,7 +132,8 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
           <div className="min-h-[400px]">
             {currentStep === 1 && <Step1Contact />}
             {currentStep === 2 && <Step2Company />}
-            {currentStep === 3 && <Step3Meeting />}
+            {currentStep === 3 && <Step3ProjectDetails />}
+            {currentStep === 4 && <Step4Meeting />}
           </div>
 
           {submitError && (
@@ -143,7 +154,7 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
               </button>
             ) : <div />}
 
-            {currentStep < 3 ? (
+            {currentStep < 4 ? (
               <button
                 type="button"
                 onClick={handleNext}

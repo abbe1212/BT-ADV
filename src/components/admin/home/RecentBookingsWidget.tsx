@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { CalendarDays, Phone, Video, MapPin, LucideIcon } from "lucide-react";
+import { CalendarDays, Phone, Video, MapPin, Clock, LucideIcon } from "lucide-react";
 import type { Booking } from "@/lib/supabase/types";
 import { BookingStatusBadge } from "@/components/admin/bookings/BookingStatusBadge";
 
@@ -35,31 +35,55 @@ export function RecentBookingsWidget({ bookings }: { bookings: Booking[] }) {
               <tr>
                 <th className="px-4 py-3 font-medium">Ref</th>
                 <th className="px-4 py-3 font-medium">Client</th>
-                <th className="px-4 py-3 font-medium">Date</th>
-                <th className="px-4 py-3 font-medium">Type</th>
+                <th className="px-4 py-3 font-medium">Preferred Time</th>
+                <th className="px-4 py-3 font-medium">Project Type</th>
                 <th className="px-4 py-3 font-medium">Budget</th>
                 <th className="px-4 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#14304A]">
               {bookings.map((booking) => {
-                const TypeIcon = typeIcons[booking.type] || Phone;
                 const typeLabel = booking.type === 'phone' ? 'Phone Call' : booking.type === 'onsite' ? 'On-Site' : 'Zoom';
+                const budgetDisplay = (() => {
+                  const n = Number(booking.estimated_budget);
+                  if (!booking.estimated_budget || isNaN(n)) return booking.estimated_budget?.toUpperCase() ?? '—';
+                  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+                  if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}k`;
+                  return String(n);
+                })();
                 return (
-                  <tr key={booking.ref_code} className="hover:bg-[#0d2538] transition-colors group relative">
-                    <td className="px-4 py-3 font-mono text-white/80 group-hover:text-white">
+                  <tr key={booking.ref_code} className="hover:bg-[#0d2538] transition-colors group relative cursor-pointer">
+                    <td className="px-4 py-3 font-mono text-white/80 group-hover:text-[#FFEE34] transition-colors">
                       <div className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-1 bg-[#FFEE34] transition-all shadow-[0_0_10px_#FFEE34]" />
-                      {booking.ref_code}
+                      <Link href={`/admin/bookings/${booking.id}`} className="hover:underline">
+                        {booking.ref_code}
+                      </Link>
                     </td>
-                    <td className="px-4 py-3 font-medium text-white">{booking.name}</td>
-                    <td className="px-4 py-3 text-white/70">{booking.date}</td>
+                    <td className="px-4 py-3 font-medium text-white">
+                      <Link href={`/admin/bookings/${booking.id}`} className="block">
+                        <span className="block">{booking.name}</span>
+                        {booking.company_name && (
+                          <span className="text-xs text-white/50">{booking.company_name}</span>
+                        )}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5 text-white/70">
-                        <TypeIcon className="w-3.5 h-3.5" />
-                        <span>{typeLabel}</span>
+                      <div className="flex items-center gap-1.5 text-[#FFEE34] font-semibold">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{booking.time_slot || '—'}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-white/70">{booking.estimated_budget?.toUpperCase() ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-white/80 flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5" /> {typeLabel}
+                        </span>
+                        {booking.project_type && (
+                          <span className="text-xs text-white/50 truncate max-w-[140px]">{booking.project_type}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-white/80 font-medium">{budgetDisplay}</td>
                     <td className="px-4 py-3">
                       <BookingStatusBadge status={booking.status} />
                     </td>

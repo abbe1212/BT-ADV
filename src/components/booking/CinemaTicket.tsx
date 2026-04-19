@@ -11,7 +11,7 @@ type TicketData = BookingWizardData & {
   ref_code: string;
 };
 
-const meetingLabels: Record<TicketData["type"], string> = {
+const meetingLabels: Record<string, string> = {
   phone:   "📞 PHONE CALL",
   onsite:  "📍 ON-SITE VISIT",
   zoom:    "🎥 ZOOM MEETING",
@@ -24,10 +24,17 @@ const DOTS = Array.from({ length: 13 });
 
 /* ─── TicketRender ────────────────────────────────────────────────────────── */
 function TicketRender({ data }: { data: TicketData }) {
-  const day   = data.date.toLocaleDateString("en-GB", { day: "2-digit" });
-  const month = data.date.toLocaleDateString("en-GB", { month: "long" });
-  const year  = data.date.toLocaleDateString("en-GB", { year: "numeric" });
-  const session = meetingLabels[data.type] ?? data.type.toUpperCase();
+  // date is now optional — fall back to booking reference
+  const dateLabel = data.date instanceof Date
+    ? data.date.toLocaleDateString("en-GB", { day: "2-digit" })
+    : "—";
+  const monthLabel = data.date instanceof Date
+    ? data.date.toLocaleDateString("en-GB", { month: "long" })
+    : "";
+  const yearLabel = data.date instanceof Date
+    ? data.date.toLocaleDateString("en-GB", { year: "numeric" })
+    : new Date().getFullYear().toString();
+  const session = meetingLabels[data.type] ?? "📞 PHONE CALL";
 
   return (
     <div style={{
@@ -63,11 +70,11 @@ function TicketRender({ data }: { data: TicketData }) {
 
         {/* Date / Time / Session / Budget row */}
         <div style={{ display:"flex", alignItems:"flex-start", gap:0, marginTop:"8px" }}>
-          {/* Date */}
+          {/* Date — shows preferred time range since date picker was removed */}
           <div style={{ marginRight:"14px" }}>
             <p style={{ margin:"0 0 2px", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", opacity:0.55, fontWeight:700 }}>DATE</p>
-            <p style={{ margin:0, fontSize:"36px", fontWeight:900, lineHeight:1 }}>{day}</p>
-            <p style={{ margin:"2px 0 0", fontSize:"10px", fontWeight:800, textTransform:"uppercase", letterSpacing:"2px" }}>{month} {year}</p>
+            <p style={{ margin:0, fontSize:"22px", fontWeight:900, lineHeight:1 }}>{dateLabel}</p>
+            <p style={{ margin:"2px 0 0", fontSize:"10px", fontWeight:800, textTransform:"uppercase", letterSpacing:"2px" }}>{monthLabel} {yearLabel}</p>
           </div>
 
           <div style={{ width:"2px", height:"52px", borderLeft:"2px dashed rgba(0,32,60,0.4)", marginRight:"14px", marginTop:"20px" }} />
@@ -117,7 +124,7 @@ function TicketRender({ data }: { data: TicketData }) {
           <span style={{ fontSize:"11px", letterSpacing:"2px", opacity:0.5, fontWeight:700 }}>{data.ref_code}</span>
           <span style={{ fontSize:"22px", fontWeight:900, letterSpacing:"4px", textTransform:"uppercase" }}>BT-ADV</span>
           <span style={{ fontSize:"11px", letterSpacing:"3px", opacity:0.5, fontWeight:700 }}>
-            {data.date.toLocaleDateString("en-GB")}
+            {data.date instanceof Date ? data.date.toLocaleDateString("en-GB") : data.time_slot}
           </span>
         </div>
       </div>
@@ -178,8 +185,8 @@ export default function CinemaTicket({
         </div>
       </div>
 
-      {/* Countdown to booking date */}
-      <CountdownTimer targetDate={ticketData.date} />
+      {/* Countdown — only shown if a specific date was set */}
+      {ticketData.date instanceof Date && <CountdownTimer targetDate={ticketData.date} />}
 
       {/* Buttons */}
       <div className="flex items-center gap-3 w-full justify-center flex-wrap mt-1">

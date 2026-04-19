@@ -46,18 +46,24 @@ export interface Booking {
   email: string;
   phone: string;
   address: string | null;
-  date: string;          // YYYY-MM-DD
-  time_slot: string;     // HH:MM
+  date: string | null;   // YYYY-MM-DD (now optional — replaced by time range)
+  time_slot: string;     // Preferred time range (e.g. '10am-12pm')
   type: 'phone' | 'onsite' | 'zoom';
   estimated_budget: string | null;
   status: 'pending' | 'confirmed' | 'cancelled';
   notes: string | null;
+  company_name: string | null;
   company_brief: string | null;
   industry: string | null;
   has_brand_guide: boolean;
   previous_ads: boolean;
-  target_audience: 'youth' | 'families' | 'businesses' | 'general' | null;
+  target_audience: 'B2B' | 'B2C' | 'General' | 'Other' | null;
   platforms: string[] | null;
+  project_type: string | null;
+  project_type_other: string | null;
+  project_goal: string | null;
+  project_goal_other: string | null;
+  planning_start: string | null;
   created_at: string;
 }
 
@@ -67,18 +73,24 @@ export interface BookingInsert {
   email: string;
   phone: string;
   address?: string;
-  date: string;
+  date?: string;         // Now optional
   time_slot: string;
-  type: 'phone' | 'onsite' | 'zoom';
+  type: string;          // Always 'phone' now
   estimated_budget?: string;
   status: 'pending';
   notes?: string;
+  company_name?: string | null;
   company_brief?: string | null;
   industry?: string | null;
   has_brand_guide?: boolean;
   previous_ads?: boolean;
-  target_audience?: 'youth' | 'families' | 'businesses' | 'general' | null;
+  target_audience?: 'B2B' | 'B2C' | 'General' | 'Other' | null;
   platforms?: string[] | null;
+  project_type?: string | null;
+  project_type_other?: string | null;
+  project_goal?: string | null;
+  project_goal_other?: string | null;
+  planning_start?: string | null;
 }
 
 // ─── bts ──────────────────────────────────────────────────────────────────────

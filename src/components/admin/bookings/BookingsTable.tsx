@@ -51,8 +51,8 @@ export function BookingsTable({
             <th className="px-4 py-3 font-medium">Ref</th>
             <th className="px-4 py-3 font-medium">Name</th>
             <th className="px-4 py-3 font-medium">Contact</th>
-            <th className="px-4 py-3 font-medium">Date & Time</th>
-            <th className="px-4 py-3 font-medium">Type</th>
+            <th className="px-4 py-3 font-medium">Preferred Time</th>
+            <th className="px-4 py-3 font-medium">Project Type</th>
             <th className="px-4 py-3 font-medium">Budget</th>
             <th className="px-4 py-3 font-medium">Status</th>
             <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -84,16 +84,40 @@ export function BookingsTable({
                   <td className="px-4 py-3 font-mono font-medium text-white group-hover:text-[#FFEE34] transition-colors">
                     {booking.ref_code}
                   </td>
-                  <td className="px-4 py-3 text-white font-bold">{booking.name}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-white font-bold">{booking.name}</span>
+                      {booking.company_name && (
+                        <span className="text-xs text-white/50">{booking.company_name}</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-white/80">{booking.phone}</span>
                       <span className="text-xs text-white/50">{booking.email}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-white/80">{booking.date} @ {booking.time_slot}</td>
-                  <td className="px-4 py-3 text-white/80">{typeLabel}</td>
-                  <td className="px-4 py-3 text-white/80">{booking.estimated_budget?.toUpperCase() ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-[#FFEE34] font-semibold">{booking.time_slot || '—'}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-white/80">{typeLabel}</span>
+                      {booking.project_type && (
+                        <span className="text-xs text-white/50 truncate max-w-[140px]">{booking.project_type}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-white/80">
+                    {(() => {
+                      const n = Number(booking.estimated_budget);
+                      if (!booking.estimated_budget || isNaN(n)) return booking.estimated_budget?.toUpperCase() ?? '—';
+                      if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+                      if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}k`;
+                      return String(n);
+                    })()}
+                  </td>
                   <td className="px-4 py-3">
                     <BookingStatusBadge status={booking.status} isLoading={isLoading} />
                   </td>

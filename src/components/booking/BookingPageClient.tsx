@@ -27,6 +27,7 @@ interface Props {
 
 export default function BookingPageClient({ clientLogos, services, featuredWorks, reviews }: Props) {
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
+  const [showTicket, setShowTicket] = useState(false);
   const { t } = useLanguage();
 
   return (
@@ -111,7 +112,26 @@ export default function BookingPageClient({ clientLogos, services, featuredWorks
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <BookingWizard onTicketGenerated={setTicketData} />
+                  <BookingWizard onTicketGenerated={(data) => {
+                    setTicketData(data);
+                    setTimeout(() => setShowTicket(true), 3500);
+                  }} />
+                </motion.div>
+              ) : !showTicket ? (
+                <motion.div
+                  key="transition"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col items-center justify-center min-h-[400px] text-center px-4"
+                >
+                  <h3 className="text-2xl md:text-3xl font-bold text-white leading-relaxed mb-4">
+                    Perfect — now we know who you are and what you’re aiming for.
+                  </h3>
+                  <p className="text-xl md:text-2xl text-yellow font-bold uppercase tracking-widest font-[fantasy]">
+                    Pick your time, and let’s build something that stands out.
+                  </p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -122,7 +142,10 @@ export default function BookingPageClient({ clientLogos, services, featuredWorks
                   transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
                   className="flex flex-col items-center gap-6"
                 >
-                  <CinemaTicket ticketData={ticketData} onClose={() => setTicketData(null)} />
+                  <CinemaTicket ticketData={ticketData} onClose={() => {
+                    setTicketData(null);
+                    setShowTicket(false);
+                  }} />
                 </motion.div>
               )}
             </AnimatePresence>

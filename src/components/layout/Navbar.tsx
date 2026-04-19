@@ -21,6 +21,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   const navLinks = [
     { name: t("nav.home"), href: "/" },
     { name: t("nav.works"), href: "/works" },
@@ -114,7 +125,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="md:hidden absolute top-full left-0 w-full bg-navy/70 backdrop-blur-2xl border-t border-white/10 flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+            className="md:hidden fixed top-[80px] bottom-0 left-0 w-full bg-navy/80 backdrop-blur-3xl border-t border-white/10 flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
           >
             {/* Dynamic Starry Liquid Glass Background */}
             <div className="absolute inset-0 z-0 opacity-40 pointer-events-none mix-blend-screen">
@@ -122,7 +133,8 @@ export default function Navbar() {
                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-navy/50 to-navy shadow-inner"></div>
             </div>
 
-            <ul className="flex flex-col py-6 relative z-10 min-h-[50vh]">
+            <div className="relative z-10 flex-1 w-full overflow-y-auto no-scrollbar pb-[100px]">
+              <ul className="flex flex-col py-6 min-h-max">
               {navLinks.map((link, i) => (
                 <motion.li 
                   key={link.href}
@@ -157,6 +169,7 @@ export default function Navbar() {
                 </button>
               </motion.li>
             </ul>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
