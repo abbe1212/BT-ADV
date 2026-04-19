@@ -142,13 +142,13 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-4">
+          <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-4 gap-3 w-full">
             {currentStep > 1 ? (
               <button
                 type="button"
                 onClick={handlePrev}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all font-semibold tracking-wider text-sm disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-3 rounded-lg border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all font-semibold tracking-wider text-xs sm:text-sm disabled:opacity-50 shrink-0 whitespace-nowrap"
               >
                 <ArrowLeft size={16} /> Back
               </button>
@@ -158,7 +158,7 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
               <button
                 type="button"
                 onClick={handleNext}
-                className="flex items-center gap-2 px-8 py-3 bg-yellow text-navy rounded-lg hover:shadow-[0_0_20px_rgba(255,238,52,0.6)] font-bold tracking-widest transition-all hover:scale-105"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-6 sm:px-8 py-3 bg-yellow text-navy rounded-lg hover:shadow-[0_0_20px_rgba(255,238,52,0.6)] font-bold tracking-widest transition-all hover:scale-105 text-xs sm:text-sm whitespace-nowrap"
               >
                 Next <ArrowRight size={16} />
               </button>
@@ -166,10 +166,10 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-8 py-3 bg-yellow text-navy rounded-lg hover:shadow-[0_0_20px_rgba(255,238,52,0.8)] font-bold tracking-widest transition-all hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed uppercase"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-8 py-3 bg-yellow text-navy rounded-lg hover:shadow-[0_0_20px_rgba(255,238,52,0.8)] font-bold tracking-wider sm:tracking-widest transition-all hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed uppercase text-xs sm:text-sm whitespace-nowrap"
               >
-                {isSubmitting && <Loader2 size={18} className="animate-spin" />}
-                {isSubmitting ? "Processing..." : "Confirm Booking"}
+                {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                {isSubmitting ? "Processing" : "Confirm Booking"}
               </button>
             )}
           </div>
