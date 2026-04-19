@@ -10,16 +10,6 @@ const INDUSTRIES = ["Real Estate", "F&B", "Tech", "Healthcare", "E-commerce", "E
 export default function Step2Company() {
   const { register, control, watch, setValue, formState: { errors } } = useFormContext<BookingWizardData>();
 
-  
-  const selectedPlatforms = watch("platforms") || [];
-
-  const togglePlatform = (platform: string) => {
-    if (selectedPlatforms.includes(platform)) {
-      setValue("platforms", selectedPlatforms.filter(p => p !== platform));
-    } else {
-      setValue("platforms", [...selectedPlatforms, platform]);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -86,20 +76,22 @@ export default function Step2Company() {
       <div className="flex flex-col gap-3">
         <label className="text-sm font-semibold uppercase tracking-widest text-white/80">Target Platforms</label>
         <div className="flex flex-wrap gap-2">
-          {PLATFORMS.map(platform => {
-            const isSelected = selectedPlatforms.includes(platform);
-            return (
-              <button
-                key={platform}
-                type="button"
-                onClick={() => togglePlatform(platform)}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all border
-                  ${isSelected ? 'bg-yellow/10 border-yellow text-yellow' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'}`}
-              >
+          {PLATFORMS.map(platform => (
+            <label
+              key={platform}
+              className="px-4 py-2 rounded-full text-sm font-semibold transition-all border cursor-pointer border-white/10 bg-black/30 hover:border-yellow hover:bg-yellow/5 hover:text-white text-white/50 has-[:checked]:border-yellow has-[:checked]:bg-yellow/20 has-[:checked]:text-yellow leading-none select-none"
+            >
+              <input 
+                type="checkbox" 
+                value={platform} 
+                {...register("platforms")} 
+                className="sr-only peer" 
+              />
+              <span className="transition-all peer-checked:drop-shadow-[0_0_6px_rgba(255,238,52,0.8)]">
                 {platform}
-              </button>
-            );
-          })}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 
