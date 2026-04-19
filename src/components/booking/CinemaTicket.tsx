@@ -34,7 +34,7 @@ function TicketRender({ data }: { data: TicketData }) {
   const yearLabel = data.date instanceof Date
     ? data.date.toLocaleDateString("en-GB", { year: "numeric" })
     : new Date().getFullYear().toString();
-  const session = meetingLabels[data.type] ?? "📞 PHONE CALL";
+  const session = (data.type && meetingLabels[data.type]) || "📞 PHONE CALL";
 
   return (
     <div style={{
