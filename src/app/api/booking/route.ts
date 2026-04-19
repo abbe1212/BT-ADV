@@ -44,19 +44,25 @@ function generateRefCode(): string {
 }
 
 /* ─── Date formatter ─────────────────────────────────────────────────────────*/
-function formatDate(date: string, time: string) {
-  const d = new Date(`${date}T${time}:00`);
-  return {
-    full: d.toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' }),
-    day:  d.toLocaleDateString('en-GB', { day: '2-digit' }),
-    month:d.toLocaleDateString('en-GB', { month: 'long' }),
-    year: d.toLocaleDateString('en-GB', { year: 'numeric' }),
-  };
+function getTicketDate(dateStr?: string) {
+  if (!dateStr) return { full: 'TBA', day: '—', month: 'TBA', year: '' };
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) throw new Error('Invalid Date');
+    return {
+      full: d.toLocaleDateString('en-GB', { dateStyle: 'full' }),
+      day:  d.toLocaleDateString('en-GB', { day: '2-digit' }),
+      month:d.toLocaleDateString('en-GB', { month: 'long' }),
+      year: d.toLocaleDateString('en-GB', { year: 'numeric' }),
+    };
+  } catch {
+    return { full: dateStr, day: '—', month: dateStr, year: '' };
+  }
 }
 
 /* ─── Shared ticket HTML ─────────────────────────────────────────────────────*/
-function ticketBlock(name: string, date: string, time_slot: string, type: string, budget: string, refCode: string) {
-  const d = formatDate(date, time_slot);
+function ticketBlock(name: string, date: string | undefined, time_slot: string, type: string, budget: string, refCode: string) {
+  const d = getTicketDate(date);
   const typeLabel = type.replace('onsite', 'On-Site').replace('phone', 'Phone Call').replace('zoom', 'Zoom').toUpperCase();
 
   return `
