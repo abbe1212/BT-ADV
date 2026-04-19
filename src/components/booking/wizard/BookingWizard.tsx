@@ -35,7 +35,7 @@ const bookingSchema = z.object({
   
   date: z.date().optional(),
   time_slot: z.string().min(1, "Please select a preferred time"),
-  type: z.string().default("phone"),
+  type: z.string().optional(),
   estimated_budget: z.string().min(1, "Please enter your budget").refine(v => !isNaN(Number(v)) && Number(v) > 0, "Must be a valid positive number"),
   notes: z.string().optional(),
 });
@@ -58,6 +58,7 @@ export default function BookingWizard({ onTicketGenerated }: Props) {
       platforms: [],
       has_brand_guide: false,
       previous_ads: false,
+      type: "phone",
     }
   });
 
