@@ -87,7 +87,10 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
     if (!enabled) return;
 
     const supabase = createClient();
-    const channelName = `realtime:${table}:${filter || 'all'}`;
+    // Use a unique ID to prevent "cannot add callbacks after subscribe()" errors
+    // when multiple components listen to the same table.
+    const uniqueId = Math.random().toString(36).substring(2, 9);
+    const channelName = `realtime:${table}:${filter || 'all'}:${uniqueId}`;
 
     // Build the subscription config
     const subscriptionConfig: {
@@ -180,7 +183,8 @@ export function useRealtimeSubscriptions(
     const channels: RealtimeChannel[] = [];
 
     subscriptions.forEach(({ table, event = '*', filter, onInsert, onUpdate, onDelete, onChange }) => {
-      const channelName = `realtime:${table}:${filter || 'all'}`;
+      const uniqueId = Math.random().toString(36).substring(2, 9);
+      const channelName = `realtime:${table}:${filter || 'all'}:${uniqueId}`;
 
       const subscriptionConfig: {
         event: EventType;

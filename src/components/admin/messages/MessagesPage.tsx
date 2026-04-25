@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Mail, Search, Clock, Trash2, CheckCircle2, Loader2 } from "lucide-react";
+import { Mail, Search, Clock, Trash2, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
 import type { ContactMessage } from "@/lib/supabase/types";
 import { markMessageAsRead, deleteMessage } from "@/actions/messages";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
@@ -39,6 +39,7 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
     initialMessages.length > 0 ? initialMessages[0].id : null
   );
   const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
+  const [mobileShowDetail, setMobileShowDetail] = useState(false);
   const { confirm } = useConfirm();
 
   const isAdmin = true;
@@ -130,8 +131,8 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
 
       <div className="flex-1 bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden flex shadow-xl">
         
-        {/* Left Panel: List */}
-        <div className="w-[35%] min-w-[320px] bg-[#061520] border-r border-[#14304A] flex flex-col h-full">
+        {/* Left Panel: List — hidden on mobile when detail is open */}
+        <div className={`w-full lg:w-[35%] lg:min-w-[320px] bg-[#061520] border-r border-[#14304A] flex flex-col h-full ${mobileShowDetail ? 'hidden lg:flex' : 'flex'}`}>
           {/* Search & Filters */}
           <div className="p-4 border-b border-[#14304A] space-y-4">
             <div className="relative group">
@@ -166,7 +167,7 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
                 {filteredMessages.map(msg => (
                   <button 
                     key={msg.id}
-                    onClick={() => setActiveMessageId(msg.id)}
+                    onClick={() => { setActiveMessageId(msg.id); setMobileShowDetail(true); }}
                     className={`w-full text-left p-4 transition-colors relative flex gap-3 ${
                       activeMessageId === msg.id ? "bg-[#0A1F33]" : "hover:bg-[#0A1F33]/50"
                     }`}
@@ -203,18 +204,26 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
           </div>
         </div>
 
-        {/* Right Panel: Detail */}
-        <div className="flex-1 bg-[#0A1F33] flex flex-col h-full">
+        {/* Right Panel: Detail — hidden on mobile when list is shown */}
+        <div className={`flex-1 bg-[#0A1F33] flex flex-col h-full ${mobileShowDetail ? 'flex' : 'hidden lg:flex'}`}>
           {activeMessage ? (
             <>
               {/* Detail Header */}
-              <div className="p-6 border-b border-[#14304A] bg-[#061520]/50 sticky top-0 flex justify-between items-start gap-4">
-                <div className="flex gap-4">
+              <div className="p-4 md:p-6 border-b border-[#14304A] bg-[#061520]/50 sticky top-0 flex justify-between items-start gap-4">
+                <div className="flex gap-3 md:gap-4 items-start">
+                  {/* Back button — mobile only */}
+                  <button
+                    className="lg:hidden mt-1 p-1 -ml-1 text-white/50 hover:text-white transition-colors flex-shrink-0"
+                    onClick={() => setMobileShowDetail(false)}
+                    aria-label="Back to messages"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
                   <div className="w-12 h-12 rounded-full bg-[#14304A] flex items-center justify-center text-xl font-bold text-[#FFEE34] flex-shrink-0">
                     {activeMessage.name.charAt(0)}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white leading-tight">{activeMessage.name}</h2>
+                    <h2 className="text-lg md:text-2xl font-bold text-white leading-tight">{activeMessage.name}</h2>
                     <div className="flex items-center gap-4 mt-1 text-sm text-white/60">
                       <a href={`mailto:${activeMessage.email}`} className="hover:text-[#FFEE34] transition-colors">{activeMessage.email}</a>
                       {activeMessage.phone && (

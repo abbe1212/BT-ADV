@@ -233,8 +233,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                 required
                 value={formData.image_url}
                 onChange={url => handleChange('image_url', url)}
-                bucket="works"
-                folder="covers"
+                folder="bt-agency/works"
               />
 
               {/* Video URL */}

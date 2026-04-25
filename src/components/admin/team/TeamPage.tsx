@@ -9,6 +9,7 @@ import { insertTeamMember, updateTeamMember, deleteTeamMember, type TeamMemberIn
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";
+import MediaUploader from "@/components/shared/MediaUploader";
 
 interface TeamPageProps {
   initialMembers: TeamMember[];
@@ -298,23 +299,15 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-white">Image URL</label>
-                  <div className="flex gap-3 items-center">
-                    <input 
-                      type="text" 
-                      value={formData.image_url}
-                      onChange={(e) => handleChange('image_url', e.target.value)}
-                      className="flex-1 bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
-                      placeholder="https://" 
-                    />
-                    <div className="w-10 h-10 rounded-full border border-[#14304A] bg-[#061520] overflow-hidden flex-shrink-0">
-                      {formData.image_url ? (
-                        <Image src={formData.image_url} alt="" width={40} height={40} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"><Camera className="w-4 h-4 text-white/30" /></div>
-                      )}
-                    </div>
-                  </div>
+                  <label className="text-sm font-bold text-white">Photo</label>
+                  <MediaUploader
+                    accept="image"
+                    folder="bt-agency/team"
+                    defaultUrl={formData.image_url}
+                    onUpload={(url) => handleChange('image_url', url)}
+                    onRemove={() => handleChange('image_url', '')}
+                    label="Drop member photo here"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-2">

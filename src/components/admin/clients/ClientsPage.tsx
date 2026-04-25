@@ -9,6 +9,7 @@ import type { ClientInsert, ClientUpdate } from "@/actions/clients";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";
+import MediaUploader from "@/components/shared/MediaUploader";
 
 // Common industries for the select dropdown
 const INDUSTRIES = [
@@ -367,15 +368,16 @@ export function ClientsPage({ initialClients }: ClientsPageProps) {
                </div>
 
                <div className="space-y-1.5">
-                 <label className="text-sm font-bold text-white">Logo URL</label>
-                 <input
-                   type="text"
-                   value={formData.logo_url}
-                   onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                   className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none"
-                   placeholder="https://"
+                 <label className="text-sm font-bold text-white">Logo</label>
+                 <MediaUploader
+                   accept="image"
+                   folder="bt-agency/clients"
+                   defaultUrl={formData.logo_url}
+                   onUpload={(url) => setFormData(prev => ({ ...prev, logo_url: url }))}
+                   onRemove={() => setFormData(prev => ({ ...prev, logo_url: '' }))}
+                   label="Drop client logo here"
                  />
-                 <p className="text-xs text-white/40">Provide a direct URL to a transparent PNG</p>
+                 <p className="text-xs text-white/40">PNG with transparent background recommended · max 10 MB</p>
                </div>
 
                <div className="space-y-1.5">

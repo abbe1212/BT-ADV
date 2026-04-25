@@ -9,6 +9,7 @@ import type { BtsItemInsert, BtsItemUpdate } from "@/actions/bts";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
 import { useConfirm } from "@/providers/ConfirmProvider";
+import MediaUploader from "@/components/shared/MediaUploader";
 
 interface BTSPageProps {
   initialBts: BtsItem[];
@@ -203,10 +204,30 @@ export function BTSPage({ initialBts }: BTSPageProps) {
             return (
               <div key={item.id} className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden group relative break-inside-avoid">
                 <div className="w-full bg-[#020F1C] relative aspect-video">
-                  {/* Placeholder icon */}
+                  {/* Placeholder icon — shown as fallback / before load */}
                   <div className="absolute inset-0 flex items-center justify-center text-[#14304A] group-hover:text-white/10 transition-colors">
                     {item.media_type === 'video' ? <Video className="w-10 h-10" /> : <ImageIcon className="w-10 h-10" />}
                   </div>
+
+                  {/* Actual media */}
+                  {item.media_url && (
+                    item.media_type === 'video' ? (
+                      <video
+                        src={item.media_url}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        preload="metadata"
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.media_url}
+                        alt={item.title_en || item.title_ar || 'BTS media'}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    )
+                  )}
 
                   {/* Media type badge */}
                   <div className="absolute top-2 left-2 bg-[#00203C] text-white/80 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -287,13 +308,22 @@ export function BTSPage({ initialBts }: BTSPageProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-white">URL *</label>
-                  <input
-                    type="text"
-                    value={formData.media_url}
-                    onChange={(e) => setFormData({ ...formData, media_url: e.target.value })}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none"
-                    placeholder="https://"
+                  <label className="text-sm font-bold text-white">Media File *</label>
+                  <MediaUploader
+                    accept="both"
+                    folder="bt-agency/bts"
+                    defaultUrl={formData.media_url}
+                    onUpload={(url) => {
+                      // Auto-detect type from the Cloudinary URL extension
+                      const isVideo = /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url);
+                      setFormData(prev => ({
+                        ...prev,
+                        media_url: url,
+                        media_type: isVideo ? 'video' : 'image',
+                      }));
+                    }}
+                    onRemove={() => setFormData(prev => ({ ...prev, media_url: '' }))}
+                    label="Drop image or video here"
                   />
                 </div>
 

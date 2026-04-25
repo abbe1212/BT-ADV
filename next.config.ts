@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.bing.com",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

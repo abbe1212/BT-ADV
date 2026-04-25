@@ -36,8 +36,8 @@ export function BookingsTable({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left">
+    <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+      <table className="w-full min-w-[800px] text-sm text-left">
         <thead className="text-[11px] text-white/50 uppercase tracking-wider bg-[#061520] border-b border-[#14304A]">
           <tr>
             <th className="px-4 py-3 cursor-pointer">

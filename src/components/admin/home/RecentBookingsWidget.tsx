@@ -12,7 +12,7 @@ const typeIcons: Record<string, LucideIcon> = {
 
 export function RecentBookingsWidget({ bookings }: { bookings: Booking[] }) {
   return (
-    <div className="lg:col-span-7 xl:col-span-8 bg-[#0A1F33] rounded-xl border border-[#14304A] p-5 flex flex-col">
+    <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] p-5 flex flex-col">
       <div className="flex justify-between items-end mb-4">
         <div>
           <h2 className="text-lg font-bold text-white mb-1">Recent Bookings</h2>
@@ -30,7 +30,7 @@ export function RecentBookingsWidget({ bookings }: { bookings: Booking[] }) {
             <p>No bookings yet</p>
           </div>
         ) : (
-          <table className="w-full text-sm text-left">
+          <table className="w-full min-w-[640px] text-sm text-left">
             <thead className="text-xs text-white/60 uppercase bg-[#061520] border-y border-[#14304A]">
               <tr>
                 <th className="px-4 py-3 font-medium">Ref</th>

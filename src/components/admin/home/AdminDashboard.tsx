@@ -6,7 +6,7 @@ import type { Booking, ContactMessage, Work } from "@/lib/supabase/types";
 import type { DashboardStats } from "@/lib/supabase/queries";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { StatCard } from "@/components/admin/ui/StatCard";
-import { QuickStatsChart } from "@/components/admin/home/QuickStatsChart";
+
 import { RecentBookingsWidget } from "@/components/admin/home/RecentBookingsWidget";
 import { RecentMessagesWidget } from "@/components/admin/home/RecentMessagesWidget";
 import { LatestWorksWidget } from "@/components/admin/home/LatestWorksWidget";
@@ -109,14 +109,12 @@ export function AdminDashboard({ stats: initialStats, recentBookings: initialBoo
     : stats.thisMonthBookings > 0 ? 100 : 0;
   const monthlyChangeStr = monthlyChange >= 0 ? `+${monthlyChange}%` : `${monthlyChange}%`;
 
-  const totalByType = stats.bookingsByType.phone + stats.bookingsByType.zoom + stats.bookingsByType.onsite;
-  const phonePercent = totalByType > 0 ? Math.round((stats.bookingsByType.phone / totalByType) * 100) : 0;
-  const zoomPercent = totalByType > 0 ? Math.round((stats.bookingsByType.zoom / totalByType) * 100) : 0;
+
 
   return (
     <div className="space-y-6">
       {/* ROW 1: Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <StatCard icon={CalendarDays} number={stats.totalBookings.toLocaleString()} labelAR="إجمالي الحجوزات" labelEN="Total Bookings" />
         <StatCard icon={AlertCircle} number={stats.pendingBookings.toString()} labelAR="حجوزات معلقة" labelEN="Pending Bookings" iconColor="text-amber-400" />
         <StatCard icon={TrendingUp} number={monthlyChangeStr} labelAR="الشهر الحالي" labelEN="This Month" />
@@ -124,9 +122,8 @@ export function AdminDashboard({ stats: initialStats, recentBookings: initialBoo
       </div>
 
       {/* ROW 2: Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <RecentBookingsWidget bookings={bookings} />
-        <QuickStatsChart phonePercent={phonePercent} zoomPercent={zoomPercent} totalByType={totalByType} />
       </div>
 
       {/* ROW 3: Messages & Works */}

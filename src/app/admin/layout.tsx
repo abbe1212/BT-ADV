@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { headers } from 'next/headers';
-import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
+import { AdminSidebar, SidebarProvider } from '@/components/admin/layout/AdminSidebar';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { ReactQueryProvider } from '@/providers/QueryProvider';
 import { ConfirmProvider } from '@/providers/ConfirmProvider';
@@ -63,14 +63,16 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#00203C] text-white flex font-['Cairo']">
-      <AdminSidebar />
-      <div className="flex-1 ml-[240px] flex flex-col min-w-0">
-        <AdminHeader />
-        <main className="flex-1 p-8 overflow-x-hidden">
-          {content}
-        </main>
+    <SidebarProvider>
+      <div className="min-h-screen bg-[#00203C] text-white flex font-['Cairo']">
+        <AdminSidebar />
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <AdminHeader />
+          <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+            {content}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

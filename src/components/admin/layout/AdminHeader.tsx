@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Bell, LogOut, User } from "lucide-react";
+import { Search, Bell, LogOut, User, Menu } from "lucide-react";
+import { useContext } from "react";
+import { SidebarContext } from "@/components/admin/layout/AdminSidebar";
 import { createClient } from "@/lib/supabase/client";
 
 export function AdminHeader() {
@@ -53,11 +55,23 @@ export function AdminHeader() {
     return userEmail.charAt(0).toUpperCase();
   };
 
-  return (
-    <header className="h-[64px] bg-[#020F1C]/80 backdrop-blur-md border-b border-[#0A1F33] flex items-center justify-between px-8 sticky top-0 z-40">
-      <h1 className="text-xl font-bold text-white font-['Cairo']">{getPageTitle()}</h1>
+  const { setMobileOpen } = useContext(SidebarContext);
 
-      <div className="flex items-center gap-6">
+  return (
+    <header className="h-[64px] bg-[#020F1C]/80 backdrop-blur-md border-b border-[#0A1F33] flex items-center justify-between px-4 md:px-8 sticky top-0 z-40">
+      <div className="flex items-center gap-3">
+        {/* Hamburger — mobile only */}
+        <button
+          className="lg:hidden p-2 -ml-1 rounded-lg text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open navigation"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl font-bold text-white font-['Cairo']">{getPageTitle()}</h1>
+      </div>
+
+      <div className="flex items-center gap-4 md:gap-6">
         {/* Search */}
         <div className="relative group hidden md:block">
           <Search className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-[#FFEE34] transition-colors" />
