@@ -14,7 +14,7 @@ export default function Step2Company() {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-[fantasy]">Company Brief</h2>
+        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-display">Company Brief</h2>
         <p className="text-white/50 text-sm mt-1">Tell us about your brand</p>
       </div>
 

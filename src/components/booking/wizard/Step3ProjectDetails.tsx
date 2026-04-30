@@ -13,7 +13,7 @@ export default function Step3ProjectDetails() {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-[fantasy]">Project Details</h2>
+        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-display">Project Details</h2>
         <p className="text-white/50 text-sm mt-1">What are we building together?</p>
       </div>
 

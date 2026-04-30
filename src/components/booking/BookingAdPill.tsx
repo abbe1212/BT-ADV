@@ -22,7 +22,7 @@ export default function BookingAdPill({ clients }: Props) {
       <div className="flex items-center gap-2 px-4 pt-4 pb-3">
         <Megaphone className="w-4 h-4 text-yellow flex-shrink-0" />
         <span className="text-yellow text-xs font-bold uppercase tracking-widest">
-          إعلاناتنا
+          Our Ads
         </span>
       </div>
 

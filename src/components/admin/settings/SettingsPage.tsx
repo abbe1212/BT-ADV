@@ -75,13 +75,13 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
         </div>
       </div>
 
-      <div className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-border-input overflow-hidden">
         <div className="p-8 space-y-10">
           
           {/* Contact Info */}
           <section className="space-y-5">
             <div>
-              <h3 className="text-lg font-bold text-[#FFEE34] mb-1">Contact Information</h3>
+              <h3 className="text-lg font-bold text-yellow mb-1">Contact Information</h3>
               <p className="text-xs text-white/50">معلومات التواصل الأساسية</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,7 +94,7 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   type="text" 
                   value={settings[SETTING_KEYS.phone]} 
                   onChange={(e) => handleChange(SETTING_KEYS.phone, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
               <div className="space-y-1.5">
@@ -106,18 +106,18 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   type="email" 
                   value={settings[SETTING_KEYS.email]} 
                   onChange={(e) => handleChange(SETTING_KEYS.email, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
             </div>
           </section>
 
-          <hr className="border-[#14304A]" />
+          <hr className="border-border-input" />
 
           {/* Social Media */}
           <section className="space-y-5">
             <div>
-              <h3 className="text-lg font-bold text-[#FFEE34] mb-1">Social Media</h3>
+              <h3 className="text-lg font-bold text-yellow mb-1">Social Media</h3>
               <p className="text-xs text-white/50">روابط منصات التواصل الاجتماعي</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -130,7 +130,7 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   type="url" 
                   value={settings[SETTING_KEYS.instagram]} 
                   onChange={(e) => handleChange(SETTING_KEYS.instagram, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
               <div className="space-y-1.5">
@@ -142,18 +142,18 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   type="url" 
                   value={settings[SETTING_KEYS.facebook]} 
                   onChange={(e) => handleChange(SETTING_KEYS.facebook, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
             </div>
           </section>
 
-          <hr className="border-[#14304A]" />
+          <hr className="border-border-input" />
 
           {/* Site Content */}
           <section className="space-y-5">
             <div>
-              <h3 className="text-lg font-bold text-[#FFEE34] mb-1">Site Content</h3>
+              <h3 className="text-lg font-bold text-yellow mb-1">Site Content</h3>
               <p className="text-xs text-white/50">محتوى وعناوين الموقع</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -165,7 +165,7 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   type="text" 
                   value={settings[SETTING_KEYS.tagline_en]} 
                   onChange={(e) => handleChange(SETTING_KEYS.tagline_en, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
               <div className="space-y-1.5">
@@ -178,18 +178,18 @@ export function SettingsPage({ initialSettings }: SettingsPageProps) {
                   dir="rtl" 
                   value={settings[SETTING_KEYS.tagline_ar]} 
                   onChange={(e) => handleChange(SETTING_KEYS.tagline_ar, e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:outline-none focus:border-[#FFEE34] transition-all" 
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:outline-none focus:border-yellow transition-all" 
                 />
               </div>
             </div>
           </section>
         </div>
 
-        <div className="p-6 bg-[#061520] border-t border-[#14304A]">
+        <div className="p-6 bg-surface-deep border-t border-border-input">
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full py-4 bg-[#FFEE34] text-[#00203C] rounded-xl font-bold text-lg hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-4 bg-yellow text-navy rounded-xl font-bold text-lg hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSaving ? (
               <Loader2 className="w-5 h-5 animate-spin" />

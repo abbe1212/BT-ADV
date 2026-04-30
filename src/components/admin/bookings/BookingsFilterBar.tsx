@@ -50,18 +50,18 @@ export function BookingsFilterBar({
   };
 
   return (
-    <div className="bg-[#0A1F33] p-4 rounded-xl border border-[#14304A] space-y-3">
+    <div className="bg-surface p-4 rounded-xl border border-border-input space-y-3">
       {/* Row 1: Search + Status + Type */}
       <div className="flex flex-wrap gap-3 items-center">
         {/* Search input */}
         <div className="relative flex-1 min-w-[200px] max-w-xs group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-focus-within:text-[#FFEE34] transition-colors" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-focus-within:text-yellow transition-colors" />
           <input
             type="text"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder="Search name, email, ref…"
-            className="w-full bg-[#061520] text-sm text-white border border-[#14304A] rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+            className="w-full bg-surface-deep text-sm text-white border border-border-input rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
           />
           {localSearch && (
             <button
@@ -77,7 +77,7 @@ export function BookingsFilterBar({
         <select
           value={status}
           onChange={(e) => onFilterChange('status', e.target.value)}
-          className="bg-[#061520] text-sm text-white/80 border border-[#14304A] rounded-lg px-3 py-2 focus:outline-none focus:border-[#FFEE34] appearance-none cursor-pointer hover:bg-[#0d2538] transition-colors"
+          className="bg-surface-deep text-sm text-white/80 border border-border-input rounded-lg px-3 py-2 focus:outline-none focus:border-yellow appearance-none cursor-pointer hover:bg-[#0d2538] transition-colors"
         >
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
@@ -89,7 +89,7 @@ export function BookingsFilterBar({
         <select
           value={type}
           onChange={(e) => onFilterChange('type', e.target.value)}
-          className="bg-[#061520] text-sm text-white/80 border border-[#14304A] rounded-lg px-3 py-2 focus:outline-none focus:border-[#FFEE34] appearance-none cursor-pointer hover:bg-[#0d2538] transition-colors"
+          className="bg-surface-deep text-sm text-white/80 border border-border-input rounded-lg px-3 py-2 focus:outline-none focus:border-yellow appearance-none cursor-pointer hover:bg-[#0d2538] transition-colors"
         >
           <option value="">All Types</option>
           <option value="phone">Phone Call</option>
@@ -101,7 +101,7 @@ export function BookingsFilterBar({
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#FFEE34]/80 hover:text-[#FFEE34] border border-[#FFEE34]/20 hover:border-[#FFEE34]/50 bg-[#FFEE34]/5 px-3 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-xs font-bold text-yellow/80 hover:text-yellow border border-yellow/20 hover:border-yellow/50 bg-yellow/5 px-3 py-2 rounded-lg transition-colors"
           >
             <X className="w-3.5 h-3.5" />
             Clear Filters
@@ -117,7 +117,7 @@ export function BookingsFilterBar({
             type="date"
             value={dateFrom}
             onChange={(e) => onFilterChange('dateFrom', e.target.value)}
-            className="bg-[#061520] text-sm text-white/80 border border-[#14304A] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#FFEE34] transition-all cursor-pointer [color-scheme:dark]"
+            className="bg-surface-deep text-sm text-white/80 border border-border-input rounded-lg px-3 py-1.5 focus:outline-none focus:border-yellow transition-all cursor-pointer [color-scheme:dark]"
           />
           <span className="text-white/30 text-xs">→</span>
           <input
@@ -125,7 +125,7 @@ export function BookingsFilterBar({
             value={dateTo}
             min={dateFrom || undefined}
             onChange={(e) => onFilterChange('dateTo', e.target.value)}
-            className="bg-[#061520] text-sm text-white/80 border border-[#14304A] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#FFEE34] transition-all cursor-pointer [color-scheme:dark]"
+            className="bg-surface-deep text-sm text-white/80 border border-border-input rounded-lg px-3 py-1.5 focus:outline-none focus:border-yellow transition-all cursor-pointer [color-scheme:dark]"
           />
           {(dateFrom || dateTo) && (
             <button
@@ -142,7 +142,7 @@ export function BookingsFilterBar({
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-1.5 ml-auto">
             {status && (
-              <span className="text-xs font-bold bg-[#FFEE34]/10 text-[#FFEE34] border border-[#FFEE34]/20 px-2 py-0.5 rounded-full capitalize">
+              <span className="text-xs font-bold bg-yellow/10 text-yellow border border-yellow/20 px-2 py-0.5 rounded-full capitalize">
                 {status}
               </span>
             )}

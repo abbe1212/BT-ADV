@@ -18,13 +18,13 @@ function formatTimeAgo(dateStr: string): string {
 
 export function RecentMessagesWidget({ messages }: { messages: ContactMessage[] }) {
   return (
-    <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] p-5">
+    <div className="bg-surface rounded-xl border border-border-input p-5">
       <div className="flex justify-between items-end mb-6">
         <div>
           <h2 className="text-lg font-bold text-white mb-1">Recent Messages</h2>
           <p className="text-xs text-white/50 uppercase tracking-wide">الرسائل الأخيرة</p>
         </div>
-        <Link href="/admin/messages" className="text-sm text-[#FFEE34] hover:underline font-semibold">
+        <Link href="/admin/messages" className="text-sm text-yellow hover:underline font-semibold">
           View All
         </Link>
       </div>
@@ -37,13 +37,13 @@ export function RecentMessagesWidget({ messages }: { messages: ContactMessage[] 
       ) : (
         <div className="space-y-4">
           {messages.map((msg) => (
-            <div key={msg.id} className="relative p-4 rounded-lg bg-[#061520] border border-[#14304A] hover:border-[#FFEE34]/30 transition-colors cursor-pointer group">
+            <div key={msg.id} className="relative p-4 rounded-lg bg-surface-deep border border-border-input hover:border-yellow/30 transition-colors cursor-pointer group">
               {msg.is_read === false && (
-                <div className="absolute top-4 left-3 w-2 h-2 rounded-full bg-[#FFEE34] shadow-[0_0_8px_#FFEE34]" />
+                <div className="absolute top-4 left-3 w-2 h-2 rounded-full bg-yellow shadow-[0_0_8px_#FFEE34]" />
               )}
               <div className={`pl-4 ${msg.is_read && 'pl-0'}`}>
                 <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-white group-hover:text-[#FFEE34] transition-colors">{msg.name}</h4>
+                  <h4 className="font-bold text-white group-hover:text-yellow transition-colors">{msg.name}</h4>
                   <span className="text-xs text-white/40">{formatTimeAgo(msg.created_at)}</span>
                 </div>
                 <p className="text-xs text-white/50 mb-2">{msg.email}</p>

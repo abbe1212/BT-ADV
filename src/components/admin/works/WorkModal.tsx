@@ -153,11 +153,11 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-2xl bg-[#0A1F33] rounded-2xl border border-[#14304A] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+            className="relative w-full max-w-2xl bg-surface rounded-2xl border border-border-input shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-[#14304A] bg-[#061520] relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#FFEE34]" />
+            <div className="flex items-center justify-between p-6 border-b border-border-input bg-surface-deep relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-yellow" />
               <div>
                 <h3 id="work-modal-title" className="text-xl font-bold text-white">
                   {work ? 'Edit Work' : 'Add New Work'}
@@ -167,7 +167,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
               <button
                 onClick={onClose}
                 aria-label="Close modal"
-                className="text-white/50 hover:text-white transition-colors bg-[#0A1F33] p-2 rounded-lg border border-[#14304A]"
+                className="text-white/50 hover:text-white transition-colors bg-surface p-2 rounded-lg border border-border-input"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -183,7 +183,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     type="text"
                     value={formData.title_en}
                     onChange={e => handleChange('title_en', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
                     placeholder="e.g. Summer Campaign"
                   />
                 </div>
@@ -194,7 +194,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     dir="rtl"
                     value={formData.title_ar}
                     onChange={e => handleChange('title_ar', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
                     placeholder="مثال: حملة الصيف"
                   />
                 </div>
@@ -207,7 +207,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                   <select
                     value={formData.category}
                     onChange={e => handleChange('category', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all appearance-none cursor-pointer"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all appearance-none cursor-pointer"
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -222,7 +222,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     min={2000}
                     max={new Date().getFullYear() + 1}
                     onChange={e => handleChange('year', parseInt(e.target.value) || new Date().getFullYear())}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
                   />
                 </div>
               </div>
@@ -245,7 +245,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     type="text"
                     value={formData.video_url}
                     onChange={e => handleChange('video_url', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
                     placeholder="https://youtube.com/watch?v=..."
                   />
                 </div>
@@ -260,7 +260,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     value={formData.order_index}
                     min={0}
                     onChange={e => handleChange('order_index', parseInt(e.target.value) || 0)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
                   />
                 </div>
                 <div className="flex items-center mt-8 space-x-3">
@@ -269,7 +269,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                     id="work-modal-featured"
                     checked={formData.featured}
                     onChange={e => handleChange('featured', e.target.checked)}
-                    className="w-5 h-5 accent-[#FFEE34] rounded cursor-pointer"
+                    className="w-5 h-5 accent-yellow rounded cursor-pointer"
                   />
                   <label htmlFor="work-modal-featured" className="text-sm font-bold text-white cursor-pointer select-none">
                     Mark as Featured Work
@@ -279,18 +279,18 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
             </div>
 
             {/* Footer */}
-            <div className="p-5 border-t border-[#14304A] bg-[#061520] flex justify-end gap-3 rounded-b-2xl">
+            <div className="p-5 border-t border-border-input bg-surface-deep flex justify-end gap-3 rounded-b-2xl">
               <button
                 onClick={onClose}
                 disabled={isSaving}
-                className="px-6 py-2.5 rounded-lg border border-[#FFEE34] text-[#FFEE34] font-bold hover:bg-[#FFEE34]/10 transition-colors disabled:opacity-50"
+                className="px-6 py-2.5 rounded-lg border border-yellow text-yellow font-bold hover:bg-yellow/10 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-8 py-2.5 rounded-lg bg-[#FFEE34] text-[#00203C] font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-8 py-2.5 rounded-lg bg-yellow text-navy font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isSaving ? 'Saving...' : 'Save Changes'}

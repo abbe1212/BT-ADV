@@ -96,7 +96,7 @@ export default function BookingPageClient({ clientLogos, services, featuredWorks
             {/* Top glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-28 bg-yellow/10 blur-[70px] rounded-full pointer-events-none" />
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-yellow mb-4 text-center uppercase tracking-widest font-[fantasy] drop-shadow-[0_0_15px_rgba(255,238,52,0.6)]">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-yellow mb-4 text-center uppercase tracking-widest font-display drop-shadow-[0_0_15px_rgba(255,238,52,0.6)]">
               {t("booking.title") || "Book Your Slot"}
             </h1>
             <p className="text-white/70 text-center mb-10 max-w-xl mx-auto text-sm md:text-base">
@@ -129,17 +129,17 @@ export default function BookingPageClient({ clientLogos, services, featuredWorks
                   <h3 className="text-2xl md:text-3xl font-bold text-white leading-relaxed mb-4">
                     Perfect — now we know who you are and what you’re aiming for.
                   </h3>
-                  <p className="text-xl md:text-2xl text-yellow font-bold uppercase tracking-widest font-[fantasy]">
+                  <p className="text-xl md:text-2xl text-yellow font-bold uppercase tracking-widest font-display">
                     Pick your time, and let’s build something that stands out.
                   </p>
                 </motion.div>
               ) : (
                 <motion.div
                   key="ticket"
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   className="flex flex-col items-center gap-6"
                 >
                   <CinemaTicket ticketData={ticketData} onClose={() => {

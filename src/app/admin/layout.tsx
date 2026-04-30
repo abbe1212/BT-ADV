@@ -64,7 +64,7 @@ export default async function AdminLayout({
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-[#00203C] text-white flex font-['Cairo']">
+      <div className="min-h-screen bg-navy text-white flex font-['Cairo']">
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <AdminHeader />

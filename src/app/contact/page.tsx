@@ -52,11 +52,11 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-navy flex flex-col items-center">
+    <main id="main-content" className="min-h-screen bg-navy flex flex-col items-center">
       <Navbar />
 
-      <div className="w-full relative mt-24 py-16 bg-gradient-to-b from-[#0a1526] to-navy flex items-center justify-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-[fantasy]">
+      <div className="w-full relative mt-24 py-16 bg-gradient-to-b from-surface-deep to-navy flex items-center justify-center">
+        <h1 className="text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-display">
           Contact Us
         </h1>
       </div>
@@ -94,17 +94,18 @@ export default function ContactPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 bg-[#121c2b] border border-white/10 rounded-xl shadow-2xl">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 bg-surface-raised border border-white/10 rounded-xl shadow-2xl">
             <h3 className="text-xl text-yellow font-bold uppercase tracking-widest mb-2 border-b border-white/10 pb-4">
               Send a Transmission
             </h3>
 
             {/* Name */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-white/60">Name *</label>
+              <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-widest text-white/60">Name *</label>
               <div className="relative">
                 <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
                 <input
+                  id="contact-name"
                   name="name"
                   type="text"
                   required
@@ -118,10 +119,11 @@ export default function ContactPage() {
 
             {/* Email */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-white/60">Email *</label>
+              <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-widest text-white/60">Email *</label>
               <div className="relative">
                 <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
                 <input
+                  id="contact-email"
                   name="email"
                   type="email"
                   required
@@ -135,10 +137,11 @@ export default function ContactPage() {
 
             {/* Phone — added to match contact_messages schema */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-white/60">Phone</label>
+              <label htmlFor="contact-phone" className="text-xs font-semibold uppercase tracking-widest text-white/60">Phone</label>
               <div className="relative">
                 <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
                 <input
+                  id="contact-phone"
                   name="phone"
                   type="tel"
                   value={form.phone}
@@ -151,10 +154,11 @@ export default function ContactPage() {
 
             {/* Message */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-white/60">Message *</label>
+              <label htmlFor="contact-message" className="text-xs font-semibold uppercase tracking-widest text-white/60">Message *</label>
               <div className="relative">
                 <MessageSquare size={18} className="absolute left-4 top-4 text-white/40" />
                 <textarea
+                  id="contact-message"
                   name="message"
                   rows={4}
                   required

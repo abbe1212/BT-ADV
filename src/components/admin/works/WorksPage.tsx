@@ -117,7 +117,7 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-[#FFEE34] text-[#00203C] hover:bg-white transition-colors px-6 py-2.5 rounded-lg font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
+          className="flex items-center gap-2 bg-yellow text-navy hover:bg-white transition-colors px-6 py-2.5 rounded-lg font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
         >
           <Plus className="w-5 h-5" />
           <span>Add New Work</span>
@@ -125,16 +125,16 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
       </div>
 
       {/* ── Filter Bar ──────────────────────────────────────────────────────── */}
-      <div className="bg-[#0A1F33] p-3 rounded-xl border border-[#14304A] flex flex-wrap gap-3 items-center">
+      <div className="bg-surface p-3 rounded-xl border border-border-input flex flex-wrap gap-3 items-center">
         {/* Search */}
         <div className="relative flex-1 min-w-[180px] max-w-xs group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-[#FFEE34] transition-colors" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-yellow transition-colors" />
           <input
             type="text"
             value={localSearch}
             onChange={e => setLocalSearch(e.target.value)}
             placeholder="Search works…"
-            className="w-full bg-[#061520] text-sm text-white border border-[#14304A] rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all"
+            className="w-full bg-surface-deep text-sm text-white border border-border-input rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all"
           />
           {localSearch && (
             <button onClick={() => setLocalSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white">
@@ -147,7 +147,7 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
         <select
           value={searchParams.get('category') || ''}
           onChange={e => handleFilterChange('category', e.target.value)}
-          className="bg-[#061520] text-sm text-white/80 border border-[#14304A] rounded-lg px-3 py-2 focus:outline-none focus:border-[#FFEE34] appearance-none cursor-pointer hover:bg-[#0d2538]"
+          className="bg-surface-deep text-sm text-white/80 border border-border-input rounded-lg px-3 py-2 focus:outline-none focus:border-yellow appearance-none cursor-pointer hover:bg-[#0d2538]"
         >
           <option value="">All Categories</option>
           {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -176,7 +176,7 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
 
           {/* Pagination */}
           {totalCount > pageSize && (
-            <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden">
+            <div className="bg-surface rounded-xl border border-border-input overflow-hidden">
               <PaginationControls
                 currentPage={currentPage}
                 pageSize={pageSize}
@@ -220,7 +220,7 @@ interface WorkCardProps {
 function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps) {
   return (
     <div
-      className={`bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden group ${
+      className={`bg-surface rounded-xl border border-border-input overflow-hidden group ${
         isDeletingThisCard ? 'opacity-50 pointer-events-none' : ''
       }`}
     >
@@ -228,15 +228,15 @@ function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps)
         {work.image_url ? (
           <Image src={work.image_url} alt={work.title_en || work.title_ar} fill className="object-cover" />
         ) : (
-          <ImageIcon className="w-10 h-10 text-[#14304A] group-hover:text-[#FFEE34]/20 transition-colors" />
+          <ImageIcon className="w-10 h-10 text-border-input group-hover:text-yellow/20 transition-colors" />
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-[#0A1F33]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-surface/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
           <button
             onClick={() => onEdit(work)}
             aria-label="Edit work"
-            className="w-10 h-10 rounded-full bg-[#FFEE34] text-[#00203C] flex items-center justify-center hover:scale-110 transition-transform"
+            className="w-10 h-10 rounded-full bg-yellow text-navy flex items-center justify-center hover:scale-110 transition-transform"
           >
             <Edit2 className="w-4 h-4" />
           </button>
@@ -264,7 +264,7 @@ function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps)
         </div>
 
         {work.featured && (
-          <div className="absolute top-3 right-3 bg-[#FFEE34] text-[#00203C] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+          <div className="absolute top-3 right-3 bg-yellow text-navy text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
             Featured
           </div>
         )}
@@ -272,7 +272,7 @@ function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps)
 
       <div className="p-5">
         <div className="flex justify-between items-start mb-2">
-          <span className="text-xs font-bold text-[#FFEE34] tracking-wider uppercase">{work.category}</span>
+          <span className="text-xs font-bold text-yellow tracking-wider uppercase">{work.category}</span>
           <span className="text-xs text-white/40">{work.year}</span>
         </div>
         <h3 className="text-lg font-bold text-white leading-tight mb-1">{work.title_ar}</h3>

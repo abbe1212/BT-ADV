@@ -69,6 +69,10 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
   enabled = true,
 }: UseRealtimeOptions<T>) {
   const channelRef = useRef<RealtimeChannel | null>(null);
+  // FIX: Store the client instance so unsubscribe uses the SAME instance that created the channel.
+  // Previously, unsubscribe called createClient() which returned a different instance,
+  // causing removeChannel() to silently fail and the channel to leak.
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
 
   // Stable callback refs to avoid re-subscribing on every render
   const onInsertRef = useRef(onInsert);
@@ -87,26 +91,19 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
     if (!enabled) return;
 
     const supabase = createClient();
-    // Use a unique ID to prevent "cannot add callbacks after subscribe()" errors
-    // when multiple components listen to the same table.
+    supabaseRef.current = supabase;
+
     const uniqueId = Math.random().toString(36).substring(2, 9);
     const channelName = `realtime:${table}:${filter || 'all'}:${uniqueId}`;
 
-    // Build the subscription config
     const subscriptionConfig: {
       event: EventType;
       schema: string;
       table: string;
       filter?: string;
-    } = {
-      event,
-      schema: 'public',
-      table,
-    };
+    } = { event, schema: 'public', table };
 
-    if (filter) {
-      subscriptionConfig.filter = filter;
-    }
+    if (filter) subscriptionConfig.filter = filter;
 
     const channel = supabase
       .channel(channelName)
@@ -114,10 +111,8 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
         'postgres_changes',
         subscriptionConfig,
         (payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>) => {
-          // Call the generic onChange handler
           onChangeRef.current?.(payload);
 
-          // Call specific event handlers
           switch (payload.eventType) {
             case 'INSERT':
               if (payload.new && onInsertRef.current) {
@@ -138,31 +133,28 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
         }
       )
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`[Realtime] Subscribed to ${table}`);
-        } else if (status === 'CHANNEL_ERROR') {
+        if (status === 'CHANNEL_ERROR') {
           console.error(`[Realtime] Error subscribing to ${table}`);
         }
       });
 
     channelRef.current = channel;
 
-    // Cleanup on unmount or when dependencies change
     return () => {
-      if (channelRef.current) {
-        console.log(`[Realtime] Unsubscribing from ${table}`);
-        supabase.removeChannel(channelRef.current);
+      if (channelRef.current && supabaseRef.current) {
+        supabaseRef.current.removeChannel(channelRef.current);
         channelRef.current = null;
+        supabaseRef.current = null;
       }
     };
   }, [table, event, filter, enabled]);
 
-  // Manual unsubscribe function
+  // FIX: Uses the stored supabaseRef — not a freshly created client instance.
   const unsubscribe = useCallback(() => {
-    if (channelRef.current) {
-      const supabase = createClient();
-      supabase.removeChannel(channelRef.current);
+    if (channelRef.current && supabaseRef.current) {
+      supabaseRef.current.removeChannel(channelRef.current);
       channelRef.current = null;
+      supabaseRef.current = null;
     }
   }, []);
 
@@ -170,12 +162,22 @@ export function useRealtimeSubscription<T extends { id: string } = any>({
 }
 
 /**
- * Hook to subscribe to multiple tables at once
+ * Hook to subscribe to multiple tables at once.
+ *
+ * FIX: Serialises subscriptions to a stable JSON string as the useEffect dependency.
+ * Previously the raw `subscriptions` array was used — since arrays are objects,
+ * a new reference on every render caused infinite subscribe/unsubscribe churn
+ * that hammered Supabase with repeated connect/disconnect cycles.
  */
 export function useRealtimeSubscriptions(
   subscriptions: UseRealtimeOptions<Record<string, unknown>>[],
   enabled = true
 ) {
+  // Only re-run the effect when table/event/filter values actually change.
+  const stableKey = JSON.stringify(
+    subscriptions.map(({ table, event, filter }) => ({ table, event, filter }))
+  );
+
   useEffect(() => {
     if (!enabled || subscriptions.length === 0) return;
 
@@ -191,15 +193,9 @@ export function useRealtimeSubscriptions(
         schema: string;
         table: string;
         filter?: string;
-      } = {
-        event,
-        schema: 'public',
-        table,
-      };
+      } = { event, schema: 'public', table };
 
-      if (filter) {
-        subscriptionConfig.filter = filter;
-      }
+      if (filter) subscriptionConfig.filter = filter;
 
       const channel = supabase
         .channel(channelName)
@@ -228,11 +224,10 @@ export function useRealtimeSubscriptions(
     });
 
     return () => {
-      channels.forEach((channel) => {
-        supabase.removeChannel(channel);
-      });
+      channels.forEach((channel) => supabase.removeChannel(channel));
     };
-  }, [subscriptions, enabled]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stableKey, enabled]); // stableKey replaces the unstable raw array reference
 }
 
 export default useRealtimeSubscription;

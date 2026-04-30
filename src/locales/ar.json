@@ -15,7 +15,8 @@
   "hero": {
     "title": "أعمالنا",
     "subtitle": "نبتكر رؤيتك",
-    "book_button": "احجز إعلانك السينمائي"
+    "book_button": "احجز إعلانك السينمائي",
+    "discover_works": "اكتشف أعمالنا"
   },
   "booking": {
     "fullname": "الاسم الكامل",

@@ -9,7 +9,7 @@ export default function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="w-full bg-navy mt-auto border-t border-white/5 pt-16 pb-8 px-6 md:px-12 flex flex-col items-center">
+    <footer className="relative z-10 w-full bg-navy mt-auto border-t border-white/5 pt-16 pb-8 px-6 md:px-12 flex flex-col items-center">
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
         {/* Brand */}
         <div className="flex flex-col gap-4">

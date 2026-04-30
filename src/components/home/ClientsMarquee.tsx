@@ -22,7 +22,7 @@ export default function ClientsMarquee({ logos = [] }: Props) {
   const marqueeItems = [...logos, ...logos];
 
   return (
-    <section className="relative w-full bg-[#09090f] py-8 md:py-16 overflow-hidden">
+    <section className="relative w-full bg-pitch py-8 md:py-16 overflow-hidden">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-yellow/40 to-transparent" />
       <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-yellow/40 to-transparent" />
 
@@ -32,8 +32,8 @@ export default function ClientsMarquee({ logos = [] }: Props) {
         <div className="mx-auto mt-3 w-16 h-0.5 bg-gradient-to-r from-yellow/0 via-yellow to-yellow/0 rounded-full" />
       </div>
 
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#09090f] to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#09090f] to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-pitch to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-pitch to-transparent z-10" />
 
       <div className="overflow-hidden py-3">
         <div
@@ -43,25 +43,27 @@ export default function ClientsMarquee({ logos = [] }: Props) {
           {marqueeItems.map((logo, index) => {
             const content = (
               <div className="relative w-full h-full">
+                {/* White backing layer — gives dark logos contrast on the dark card */}
+                <div className="absolute inset-[8%] rounded-lg bg-white/[0.08] group-hover:bg-white/[0.12] transition-colors duration-300" />
                 {logo.logo_url && (
                   <Image
                     src={logo.logo_url}
                     alt={logo.name}
                     fill
-                    className="object-contain transition-transform duration-400 group-hover:scale-125 md:scale-110"
+                    className="object-contain p-[2%] transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]"
                     sizes="(max-width: 768px) 224px, 288px"
                   />
                 )}
                 {logo.youtube_url && (
-                  <div className="absolute inset-0 bg-[#09090f]/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-300 rounded-xl mt-[-12px] mb-[-12px] ml-[-16px] mr-[-16px] border border-yellow/50">
-                    <Play className="w-8 h-8 text-yellow fill-yellow mb-2 mt-4" />
-                    <span className="text-sm text-yellow font-bold uppercase tracking-widest block text-center" dir="rtl">شوف الإعلان</span>
+                  <div className="absolute inset-0 bg-black/75 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-300 rounded-xl border border-yellow/50">
+                    <Play className="w-8 h-8 text-yellow fill-yellow mb-2" />
+                    <span className="text-sm text-yellow font-bold uppercase tracking-widest block text-center">Watch Ad</span>
                   </div>
                 )}
               </div>
             );
 
-            const containerClasses = "flex-shrink-0 flex items-center justify-center w-56 h-36 md:w-72 md:h-48 rounded-xl px-4 py-3 bg-white/[0.05] border border-white/[0.10] transition-all duration-400 ease-out overflow-hidden hover:bg-white/10 hover:border-yellow/50 hover:shadow-[0_0_30px_rgba(255,238,52,0.25)] hover:scale-110 group block";
+            const containerClasses = "flex-shrink-0 flex items-center justify-center w-56 h-36 md:w-72 md:h-48 rounded-xl bg-white/[0.08] border border-white/[0.12] transition-all duration-400 ease-out overflow-hidden hover:bg-white/[0.14] hover:border-yellow/50 hover:shadow-[0_0_30px_rgba(255,238,52,0.3)] hover:scale-105 group block relative shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]";
 
             return logo.youtube_url ? (
               <a

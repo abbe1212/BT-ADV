@@ -72,48 +72,64 @@ export async function getAllAdminWorks(
   return { data: data as Work[], count: count || 0 };
 }
 
-export async function getWorkById(id: string): Promise<Work | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('works')
-    .select('*')
-    .eq('id', id)
-    .single();
+/**
+ * Single work by ID — uses anon client (no cookies) so it is cacheable.
+ * Revalidated on-demand via: `revalidateTag('works')`
+ */
+export const getWorkById = unstable_cache(
+  async (id: string): Promise<Work | null> => {
+    const supabase = createAnonClient();
+    const { data, error } = await supabase
+      .from('works')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  if (error) { console.error('[getWorkById]', error.message); return null; }
-  return data as Work;
-}
+    if (error) { console.error('[getWorkById]', error.message); return null; }
+    return data as Work;
+  },
+  ['work-by-id'],
+  { revalidate: 3600, tags: ['works'] }
+);
 
 /**
  * Returns the next work in order for carousel/navigation.
  * Fixed: uses maybeSingle() + parallel first-work fallback to eliminate
  * the previous sequential two-query waterfall.
  */
-export async function getNextWork(currentOrderIndex: number): Promise<Work | null> {
-  const supabase = createAnonClient();
+/**
+ * Returns the next work in order for carousel/navigation.
+ * Short 5-minute cache so re-ordered works propagate quickly.
+ * Revalidated on-demand via: `revalidateTag('works')`
+ */
+export const getNextWork = unstable_cache(
+  async (currentOrderIndex: number): Promise<Work | null> => {
+    const supabase = createAnonClient();
 
-  // Fetch the next work AND the first work (fallback) in parallel.
-  const [nextResult, firstResult] = await Promise.all([
-    supabase
-      .from('works')
-      .select('*')
-      .gt('order_index', currentOrderIndex)
-      .order('order_index', { ascending: true })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('works')
-      .select('*')
-      .order('order_index', { ascending: true })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+    // Fetch the next work AND the first work (fallback) in parallel.
+    const [nextResult, firstResult] = await Promise.all([
+      supabase
+        .from('works')
+        .select('*')
+        .gt('order_index', currentOrderIndex)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('works')
+        .select('*')
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-  // Use next work if found, otherwise loop around to first work.
-  return (nextResult.data ?? firstResult.data) as Work | null;
-}
+    return (nextResult.data ?? firstResult.data) as Work | null;
+  },
+  ['next-work'],
+  { revalidate: 300, tags: ['works'] } // 5 min — shorter for navigation freshness
+);
 
-export async function getFeaturedWorks(): Promise<Work[]> {
+const _getFeaturedWorks = async (): Promise<Work[]> => {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('works')
@@ -123,7 +139,17 @@ export async function getFeaturedWorks(): Promise<Work[]> {
 
   if (error) { console.error('[getFeaturedWorks]', error.message); return []; }
   return data as Work[];
-}
+};
+
+/**
+ * Featured works (used in home/about sections), cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('works')`
+ */
+export const getFeaturedWorks = unstable_cache(
+  _getFeaturedWorks,
+  ['featured-works'],
+  { revalidate: 3600, tags: ['works'] }
+);
 
 // ─── pricing ──────────────────────────────────────────────────────────────────
 
@@ -179,7 +205,7 @@ export const getServices = unstable_cache(
 
 // ─── bts ──────────────────────────────────────────────────────────────────────
 
-export async function getBts(): Promise<BtsItem[]> {
+const _getBts = async (): Promise<BtsItem[]> => {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('bts')
@@ -188,11 +214,21 @@ export async function getBts(): Promise<BtsItem[]> {
 
   if (error) { console.error('[getBts]', error.message); return []; }
   return data as BtsItem[];
-}
+};
+
+/**
+ * BTS media, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('bts')`
+ */
+export const getBts = unstable_cache(
+  _getBts,
+  ['bts'],
+  { revalidate: 3600, tags: ['bts'] }
+);
 
 // ─── team ─────────────────────────────────────────────────────────────────────
 
-export async function getTeam(featuredOnly = false): Promise<TeamMember[]> {
+const _getTeam = async (featuredOnly = false): Promise<TeamMember[]> => {
   const supabase = createAnonClient();
   let query = supabase
     .from('team')
@@ -204,11 +240,21 @@ export async function getTeam(featuredOnly = false): Promise<TeamMember[]> {
   const { data, error } = await query;
   if (error) { console.error('[getTeam]', error.message); return []; }
   return data as TeamMember[];
-}
+};
+
+/**
+ * Team members, cached for 1 hour. Two cache entries: full list and featured-only.
+ * Revalidated on-demand via: `revalidateTag('team')`
+ */
+export const getTeam = unstable_cache(
+  _getTeam,
+  ['team'],
+  { revalidate: 3600, tags: ['team'] }
+);
 
 // ─── careers ──────────────────────────────────────────────────────────────────
 
-export async function getCareers(openOnly = true): Promise<Career[]> {
+const _getCareers = async (openOnly = true): Promise<Career[]> => {
   const supabase = createAnonClient();
   let query = supabase
     .from('careers')
@@ -220,11 +266,21 @@ export async function getCareers(openOnly = true): Promise<Career[]> {
   const { data, error } = await query;
   if (error) { console.error('[getCareers]', error.message); return []; }
   return data as Career[];
-}
+};
+
+/**
+ * Open job listings, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('careers')`
+ */
+export const getCareers = unstable_cache(
+  _getCareers,
+  ['careers'],
+  { revalidate: 3600, tags: ['careers'] }
+);
 
 // ─── clients ──────────────────────────────────────────────────────────────────
 
-export async function getClients(): Promise<Client[]> {
+const _getClients = async (): Promise<Client[]> => {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('clients')
@@ -233,46 +289,67 @@ export async function getClients(): Promise<Client[]> {
 
   if (error) { console.error('[getClients]', error.message); return []; }
   return data as Client[];
-}
+};
 
-export async function getClientBySlug(slug: string): Promise<Client | null> {
-  const supabase = createAnonClient();
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+/**
+ * Public clients list, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('clients')`
+ */
+export const getClients = unstable_cache(
+  _getClients,
+  ['clients'],
+  { revalidate: 3600, tags: ['clients'] }
+);
 
-  if (error) { console.error('[getClientBySlug]', error.message); return null; }
-  return data as Client;
-}
+/**
+ * Single client by slug, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('clients')`
+ */
+export const getClientBySlug = unstable_cache(
+  async (slug: string): Promise<Client | null> => {
+    const supabase = createAnonClient();
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+
+    if (error) { console.error('[getClientBySlug]', error.message); return null; }
+    return data as Client;
+  },
+  ['client-by-slug'],
+  { revalidate: 3600, tags: ['clients'] }
+);
 
 /**
  * Fetches a client + their related works and reviews in a single
- * PostgREST nested-select (1 round-trip instead of 3).
- * Fixed: was client → [works, reviews] = 2 sequential steps total;
- * now sends 1 request and decomposes the joined payload on the server.
+ * PostgREST nested-select (1 round-trip instead of 3). Cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('clients')`
  */
-export async function getClientWithRelations(slug: string): Promise<{ client: Client, works: Work[], reviews: Review[] } | null> {
-  const supabase = createAnonClient();
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*, works(*), reviews(*)')
-    .eq('slug', slug)
-    .order('order_index', { referencedTable: 'works', ascending: true })
-    .order('order_index', { referencedTable: 'reviews', ascending: true })
-    .single();
+export const getClientWithRelations = unstable_cache(
+  async (slug: string): Promise<{ client: Client, works: Work[], reviews: Review[] } | null> => {
+    const supabase = createAnonClient();
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*, works(*), reviews(*)')
+      .eq('slug', slug)
+      .order('order_index', { referencedTable: 'works', ascending: true })
+      .order('order_index', { referencedTable: 'reviews', ascending: true })
+      .single();
 
-  if (error || !data) return null;
+    if (error || !data) return null;
 
-  const { works, reviews, ...client } = data as Client & { works: Work[]; reviews: Review[] };
+    const { works, reviews, ...client } = data as Client & { works: Work[]; reviews: Review[] };
 
-  return {
-    client: client as Client,
-    works: works || [],
-    reviews: reviews || [],
-  };
-}
+    return {
+      client: client as Client,
+      works: works || [],
+      reviews: reviews || [],
+    };
+  },
+  ['client-with-relations'],
+  { revalidate: 3600, tags: ['clients', 'works', 'reviews'] }
+);
 
 // ─── reviews ──────────────────────────────────────────────────────────────────
 
@@ -287,7 +364,7 @@ export async function getAllReviews(): Promise<Review[]> {
   return data as Review[];
 }
 
-export async function getFeaturedReviews(): Promise<Review[]> {
+const _getFeaturedReviews = async (): Promise<Review[]> => {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from('reviews')
@@ -297,19 +374,37 @@ export async function getFeaturedReviews(): Promise<Review[]> {
 
   if (error) { console.error('[getFeaturedReviews]', error.message); return []; }
   return data as Review[];
-}
+};
 
-export async function getReviewsByClient(clientId: string): Promise<Review[]> {
-  const supabase = createAnonClient();
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*, clients(*)')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: false });
+/**
+ * Featured reviews for the home page, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('reviews')`
+ */
+export const getFeaturedReviews = unstable_cache(
+  _getFeaturedReviews,
+  ['featured-reviews'],
+  { revalidate: 3600, tags: ['reviews'] }
+);
 
-  if (error) { console.error('[getReviewsByClient]', error.message); return []; }
-  return data as Review[];
-}
+/**
+ * Reviews for a specific client detail page, cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('reviews')`
+ */
+export const getReviewsByClient = unstable_cache(
+  async (clientId: string): Promise<Review[]> => {
+    const supabase = createAnonClient();
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*, clients(*)')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error('[getReviewsByClient]', error.message); return []; }
+    return data as Review[];
+  },
+  ['reviews-by-client'],
+  { revalidate: 3600, tags: ['reviews'] }
+);
 
 // ─── client_logos (deprecated) ────────────────────────────────────────────────
 
@@ -326,7 +421,7 @@ export async function getClientLogos(): Promise<ClientLogo[]> {
 
 // ─── site_settings ────────────────────────────────────────────────────────────
 
-export async function getSiteSettings(): Promise<Record<string, string>> {
+const _getSiteSettings = async (): Promise<Record<string, string>> => {
   const supabase = createAnonClient();
   const { data, error } = await supabase.from('site_settings').select('*');
 
@@ -335,7 +430,17 @@ export async function getSiteSettings(): Promise<Record<string, string>> {
     acc[row.key] = row.value;
     return acc;
   }, {});
-}
+};
+
+/**
+ * Site-wide settings (hero images, etc.), cached for 1 hour.
+ * Revalidated on-demand via: `revalidateTag('site-settings')`
+ */
+export const getSiteSettings = unstable_cache(
+  _getSiteSettings,
+  ['site-settings'],
+  { revalidate: 3600, tags: ['site-settings'] }
+);
 
 // ─── bookings ─────────────────────────────────────────────────────────────────
 

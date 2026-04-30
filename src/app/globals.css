@@ -3,16 +3,33 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-navy: #00203C;
-  --color-yellow: #FFEE34;
+
+  /* ── Brand primitives ─────────────────────────────────── */
+  --color-navy:       #00101E;
+  --color-yellow:     #FFEE34;
   --color-navy-light: #0a3355;
-  --font-latin: var(--font-inter), sans-serif;
-  --font-arabic: var(--font-cairo), sans-serif;
+
+  /* ── Surface scale (dark → lighter) ──────────────────── */
+  --color-pitch:             #080812; /* BTS, marquee — near-black, blue tint  */
+  --color-surface-base:      #020F1C; /* Admin base, deepest overlays          */
+  --color-surface-deep:      #061520; /* Admin form inputs, deepest panels     */
+  --color-surface:           #0A1F33; /* Default card / panel on navy          */
+  --color-surface-raised:    #121c2b; /* Elevated panels, form containers      */
+  --color-surface-elevated:  #1a2538; /* Topmost surfaces (table headers)      */
+
+  /* ── Border scale ─────────────────────────────────────── */
+  --color-border-subtle: #1a2c42; /* Subtle card borders                   */
+  --color-border:        #2a3b54; /* Stronger borders (table separators)   */
+  --color-border-input:  #14304A; /* Admin form input borders              */
+
+  /* ── Typography ───────────────────────────────────────── */
+  --font-latin:   var(--font-inter), sans-serif;
+  --font-arabic:  var(--font-cairo), sans-serif;
   --font-display: var(--font-display), sans-serif;
 }
 
 :root {
-  --background: #00203C;
+  --background: #00101E;
   --foreground: #ffffff;
 }
 
@@ -60,3 +77,12 @@ body {
   100% { transform: translateX(-50%); }
 }
 
+/* ─── Reduced Motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

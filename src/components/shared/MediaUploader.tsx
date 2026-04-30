@@ -26,6 +26,7 @@
 
 import React, { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 /* ─── Types ──────────────────────────────────────────────────────────────────*/
 
@@ -255,8 +256,7 @@ export default function MediaUploader({
             {isVideo ? (
               <video src={previewUrl} controls style={S.media} onClick={(e) => e.stopPropagation()} />
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={previewUrl} alt="Uploaded preview" style={S.media} />
+              <Image src={previewUrl} alt="Uploaded preview" width={400} height={340} style={S.media} />
             )}
             <div className="mu-overlay" style={S.overlay}>
               <UploadSVG color="#fff" size={20} />

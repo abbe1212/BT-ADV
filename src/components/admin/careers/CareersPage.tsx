@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Plus, Edit2, Trash2, X, Briefcase, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalFocus } from "@/hooks/useModalFocus";
 import type { Career } from "@/lib/supabase/types";
 import { insertCareer, updateCareer, deleteCareer, type CareerInsert } from "@/actions/careers";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
@@ -86,6 +87,8 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
     setFormData(emptyForm);
   };
 
+  const modalRef = useModalFocus({ isOpen: isModalOpen, onClose: closeModal });
+
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -151,7 +154,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center bg-[#0A1F33] p-6 rounded-2xl border border-[#14304A]">
+      <div className="flex justify-between items-center bg-surface p-6 rounded-2xl border border-border-input">
         <div>
           <div className="text-xs text-white/50 mb-1 flex items-center gap-2">
             <span>Admin Dashboard</span>
@@ -163,17 +166,17 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
         </div>
         <button 
           onClick={() => openModal()}
-          className="flex items-center gap-2 bg-[#FFEE34] text-[#00203C] hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
+          className="flex items-center gap-2 bg-yellow text-navy hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
         >
           <Plus className="w-5 h-5" />
           <span>Add Job Opening</span>
         </button>
       </div>
 
-      <div className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-border-input overflow-hidden">
         {jobs.length > 0 ? (
           <table className="w-full text-sm text-left">
-            <thead className="text-[11px] text-white/50 uppercase bg-[#061520] border-b border-[#14304A]">
+            <thead className="text-[11px] text-white/50 uppercase bg-surface-deep border-b border-border-input">
               <tr>
                 <th className="px-6 py-4 font-medium">Job Title</th>
                 <th className="px-6 py-4 font-medium">Department</th>
@@ -210,7 +213,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openModal(job)} className="p-1.5 bg-[#14304A] text-white hover:bg-[#FFEE34] hover:text-[#00203C] rounded transition-colors">
+                    <button onClick={() => openModal(job)} className="p-1.5 bg-border-input text-white hover:bg-yellow hover:text-navy rounded transition-colors">
                       <Edit2 className="w-4 h-4" />
                     </button>
                     {isAdmin && (
@@ -228,12 +231,12 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
           </table>
         ) : (
           <div className="p-16 text-center text-white flex flex-col items-center">
-            <div className="w-16 h-16 bg-[#061520] rounded-full flex items-center justify-center mb-4">
-              <Briefcase className="w-8 h-8 text-[#14304A]" />
+            <div className="w-16 h-16 bg-surface-deep rounded-full flex items-center justify-center mb-4">
+              <Briefcase className="w-8 h-8 text-border-input" />
             </div>
             <h3 className="text-xl font-bold mb-2">لا توجد وظائف متاحة حالياً</h3>
             <p className="text-sm text-white/50 mb-6">No jobs openings added yet.</p>
-            <button onClick={() => openModal()} className="px-6 py-2 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors">
+            <button onClick={() => openModal()} className="px-6 py-2 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors">
               Add New Job Opening
             </button>
           </div>
@@ -243,14 +246,19 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
       <AnimatePresence>
          {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
             
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-[#0A1F33] rounded-2xl overflow-hidden shadow-2xl border-t-4 border-[#FFEE34] flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-[#14304A] bg-[#061520]">
-                <h3 className="text-xl font-bold text-white">
+            <motion.div
+              ref={modalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="careers-modal-title"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-surface rounded-2xl overflow-hidden shadow-2xl border-t-4 border-yellow flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-border-input bg-surface-deep">
+                <h3 id="careers-modal-title" className="text-xl font-bold text-white">
                   {editingItem?.id ? "Edit Job" : "Add Job Opening"}
                 </h3>
-                <button onClick={closeModal} className="text-white/50 hover:text-white transition-colors bg-[#0A1F33] p-1.5 rounded-lg border border-[#14304A]">
+                <button onClick={closeModal} aria-label="Close dialog" className="text-white/50 hover:text-white transition-colors bg-surface p-1.5 rounded-lg border border-border-input">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -263,7 +271,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                       type="text" 
                       value={formData.title_en}
                       onChange={(e) => handleChange('title_en', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                   <div className="space-y-1.5 text-right">
@@ -272,7 +280,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                       type="text" dir="rtl" 
                       value={formData.title_ar}
                       onChange={(e) => handleChange('title_ar', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                 </div>
@@ -283,7 +291,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                     <select 
                       value={formData.department}
                       onChange={(e) => handleChange('department', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none appearance-none cursor-pointer"
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none appearance-none cursor-pointer"
                     >
                       {departments.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
@@ -293,7 +301,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                     <select 
                       value={formData.type}
                       onChange={(e) => handleChange('type', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none appearance-none cursor-pointer"
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none appearance-none cursor-pointer"
                     >
                       {jobTypes.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
@@ -306,7 +314,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                     rows={3} 
                     value={formData.description_en}
                     onChange={(e) => handleChange('description_en', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none resize-none"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none resize-none"
                   ></textarea>
                 </div>
 
@@ -317,7 +325,7 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                     rows={3} 
                     value={formData.description_ar}
                     onChange={(e) => handleChange('description_ar', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none resize-none"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none resize-none"
                   ></textarea>
                 </div>
 
@@ -328,19 +336,19 @@ export function CareersPage({ initialCareers }: CareersPageProps) {
                       id="isOpen" 
                       checked={formData.is_open}
                       onChange={(e) => handleChange('is_open', e.target.checked)}
-                      className="w-5 h-5 accent-[#FFEE34] bg-[#061520] border-[#14304A] rounded" 
+                      className="w-5 h-5 accent-yellow bg-surface-deep border-border-input rounded" 
                     />
                     <label htmlFor="isOpen" className="font-bold text-white text-sm select-none">Is Open (Visible on site)</label>
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 border-t border-[#14304A] bg-[#061520] flex justify-end gap-3">
+              <div className="p-5 border-t border-border-input bg-surface-deep flex justify-end gap-3">
                 <button onClick={closeModal} disabled={isSaving} className="px-6 py-2.5 text-white/70 hover:text-white font-bold transition-colors disabled:opacity-50">Cancel</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-8 py-2.5 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-8 py-2.5 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isSaving ? "Saving..." : "Save Changes"}

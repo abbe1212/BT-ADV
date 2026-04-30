@@ -36,6 +36,12 @@ export default function RootLayout({
     <html lang="en" dir="ltr" className={`${inter.variable} ${cairo.variable} ${displayFont.variable}`}>
       <body className="min-h-screen flex flex-col antialiased overflow-x-hidden selection:bg-yellow selection:text-navy">
         <LanguageProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[300] focus:bg-yellow focus:text-navy focus:font-bold focus:uppercase focus:tracking-widest focus:text-xs focus:px-5 focus:py-3 focus:rounded focus:shadow-[0_0_20px_rgba(255,238,52,0.5)] focus:outline-none transition-all"
+          >
+            Skip to main content
+          </a>
           {children}
         </LanguageProvider>
       </body>

@@ -74,25 +74,25 @@ export function AdminHeader() {
       <div className="flex items-center gap-4 md:gap-6">
         {/* Search */}
         <div className="relative group hidden md:block">
-          <Search className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-[#FFEE34] transition-colors" />
+          <Search className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-yellow transition-colors" />
           <input 
             type="text" 
             placeholder="Search..." 
-            className="bg-[#061520] text-sm text-white border border-[#0A1F33] rounded-full pl-10 pr-4 py-1.5 w-64 focus:outline-none focus:border-[#FFEE34] focus:ring-1 focus:ring-[#FFEE34] transition-all placeholder-white/40"
+            className="bg-surface-deep text-sm text-white border border-[#0A1F33] rounded-full pl-10 pr-4 py-1.5 w-64 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all placeholder-white/40"
           />
         </div>
 
         {/* Notifications */}
-        <button className="relative text-white/70 hover:text-[#FFEE34] transition-colors">
+        <button className="relative text-white/70 hover:text-yellow transition-colors">
           <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#FFEE34] rounded-full border-2 border-[#020F1C]"></span>
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-yellow rounded-full border-2 border-[#020F1C]"></span>
         </button>
 
         {/* User Menu */}
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="w-8 h-8 rounded-full border border-[#0A1F33] overflow-hidden cursor-pointer hover:border-[#FFEE34] transition-colors bg-[#FFEE34] flex items-center justify-center font-bold text-[#00203C] text-sm"
+            className="w-8 h-8 rounded-full border border-[#0A1F33] overflow-hidden cursor-pointer hover:border-yellow transition-colors bg-yellow flex items-center justify-center font-bold text-navy text-sm"
           >
             {getInitials()}
           </button>
@@ -104,10 +104,10 @@ export function AdminHeader() {
                 className="fixed inset-0 z-40"
                 onClick={() => setShowDropdown(false)}
               />
-              <div className="absolute right-0 mt-2 w-64 bg-[#0A1F33] border border-[#14304A] rounded-xl shadow-2xl overflow-hidden z-50">
-                <div className="p-4 border-b border-[#14304A]">
+              <div className="absolute right-0 mt-2 w-64 bg-surface border border-border-input rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="p-4 border-b border-border-input">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#FFEE34] flex items-center justify-center font-bold text-[#00203C]">
+                    <div className="w-10 h-10 rounded-full bg-yellow flex items-center justify-center font-bold text-navy">
                       {getInitials()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -123,7 +123,7 @@ export function AdminHeader() {
                       setShowDropdown(false);
                       router.push('/admin/settings');
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-[#14304A] hover:text-white rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-border-input hover:text-white rounded-lg transition-colors"
                   >
                     <User className="w-4 h-4" />
                     <span className="text-sm">Profile Settings</span>
@@ -134,14 +134,14 @@ export function AdminHeader() {
                       setShowDropdown(false);
                       router.push('/admin/diagnostics');
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-[#14304A] hover:text-white rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-white/80 hover:bg-border-input hover:text-white rounded-lg transition-colors"
                   >
                     <Search className="w-4 h-4" />
                     <span className="text-sm">Diagnostics</span>
                   </button>
                 </div>
 
-                <div className="p-2 border-t border-[#14304A]">
+                <div className="p-2 border-t border-border-input">
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"

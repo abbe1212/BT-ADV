@@ -34,7 +34,7 @@ export default function BookingModal({ isOpen, onClose }: { isOpen: boolean; onC
             </button>
 
             <div className="p-8 md:p-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-yellow mb-2 text-center uppercase tracking-wider font-[fantasy]">
+              <h2 className="text-3xl md:text-4xl font-bold text-yellow mb-2 text-center uppercase tracking-wider font-display">
                 {t("booking.title")}
               </h2>
               <p className="text-white/70 text-center mb-8">

@@ -10,7 +10,7 @@ export default function Step1Contact() {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-[fantasy]">Contact Info</h2>
+        <h2 className="text-2xl font-bold text-white uppercase tracking-widest font-display">Contact Info</h2>
         <p className="text-white/50 text-sm mt-1">Let's get to know each other</p>
       </div>
 

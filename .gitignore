@@ -62,3 +62,6 @@ desktop.ini
 
 # ── Misc ──────────────────────────────────────────────────────────────────────
 *.pem
+.impeccable.md
+.gitignore
+.github/copilot-instructions.md

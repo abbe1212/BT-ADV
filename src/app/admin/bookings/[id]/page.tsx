@@ -20,9 +20,9 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between bg-[#0A1F33] p-6 rounded-2xl border border-[#14304A]">
+      <div className="flex items-center justify-between bg-surface p-6 rounded-2xl border border-border-input">
         <div className="flex items-center gap-4">
-          <Link href="/admin/bookings" className="w-10 h-10 rounded-xl bg-[#14304A] flex items-center justify-center text-white/50 hover:text-white transition-colors hover:bg-[#1a3d5c]">
+          <Link href="/admin/bookings" className="w-10 h-10 rounded-xl bg-border-input flex items-center justify-center text-white/50 hover:text-white transition-colors hover:bg-[#1a3d5c]">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -45,10 +45,10 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
         <div className="lg:col-span-1 space-y-6">
           
           {/* Client Details */}
-          <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden">
-            <div className="bg-[#061520] px-5 py-3 border-b border-[#14304A]">
+          <div className="bg-surface rounded-xl border border-border-input overflow-hidden">
+            <div className="bg-surface-deep px-5 py-3 border-b border-border-input">
               <h3 className="font-bold text-white flex items-center gap-2">
-                <User className="w-4 h-4 text-[#FFEE34]" />
+                <User className="w-4 h-4 text-yellow" />
                 Client Contact
               </h3>
             </div>
@@ -81,17 +81,17 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
           </div>
 
           {/* Meeting Details */}
-          <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden">
-            <div className="bg-[#061520] px-5 py-3 border-b border-[#14304A]">
+          <div className="bg-surface rounded-xl border border-border-input overflow-hidden">
+            <div className="bg-surface-deep px-5 py-3 border-b border-border-input">
               <h3 className="font-bold text-white flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#FFEE34]" />
+                <Calendar className="w-4 h-4 text-yellow" />
                 Meeting Details
               </h3>
             </div>
             <div className="p-5 space-y-4">
               <div className="space-y-1">
                 <p className="text-xs text-white/40 uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3"/> Preferred Time</p>
-                <p className="text-[#FFEE34] font-bold">{booking.time_slot || '—'}</p>
+                <p className="text-yellow font-bold">{booking.time_slot || '—'}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-white/40 uppercase tracking-widest flex items-center gap-1.5"><Phone className="w-3 h-3"/> Meeting Type</p>
@@ -123,10 +123,10 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
         <div className="lg:col-span-2 space-y-6">
           
           {/* Company Brief Box */}
-          <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden">
-            <div className="bg-[#061520] px-5 py-3 border-b border-[#14304A]">
+          <div className="bg-surface rounded-xl border border-border-input overflow-hidden">
+            <div className="bg-surface-deep px-5 py-3 border-b border-border-input">
               <h3 className="font-bold text-white flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-[#FFEE34]" />
+                <Briefcase className="w-4 h-4 text-yellow" />
                 Company &amp; Project Brief
               </h3>
             </div>
@@ -163,7 +163,7 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
                 <div className="flex flex-wrap gap-2">
                   {booking.platforms?.length ? (
                     booking.platforms.map(p => (
-                      <span key={p} className="bg-[#14304A] border border-[#1c4060] text-white/90 px-3 py-1 rounded-md text-sm">
+                      <span key={p} className="bg-border-input border border-navy-light text-white/90 px-3 py-1 rounded-md text-sm">
                         {p}
                       </span>
                     ))
@@ -176,7 +176,7 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
               <div>
                 <p className="text-xs text-white/40 uppercase tracking-widest mb-2 flex items-center gap-1.5"><FileText className="w-3 h-3"/> Company Brief</p>
                 {booking.company_brief ? (
-                  <div className="bg-[#061520] p-4 rounded-lg border border-[#14304A]">
+                  <div className="bg-surface-deep p-4 rounded-lg border border-border-input">
                     <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">{booking.company_brief}</p>
                   </div>
                 ) : (
@@ -188,10 +188,10 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
           </div>
 
           {/* Project Details Box */}
-          <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden">
-            <div className="bg-[#061520] px-5 py-3 border-b border-[#14304A]">
+          <div className="bg-surface rounded-xl border border-border-input overflow-hidden">
+            <div className="bg-surface-deep px-5 py-3 border-b border-border-input">
               <h3 className="font-bold text-white flex items-center gap-2">
-                <Clapperboard className="w-4 h-4 text-[#FFEE34]" />
+                <Clapperboard className="w-4 h-4 text-yellow" />
                 Project Details
               </h3>
             </div>
@@ -219,7 +219,7 @@ export default async function BookingDetailsPage({ params }: { params: Promise<{
               {booking.notes && (
                 <div>
                   <p className="text-xs text-white/40 uppercase tracking-widests mb-2 flex items-center gap-1.5"><FileText className="w-3 h-3"/> Additional Notes</p>
-                  <div className="bg-[#061520] p-4 rounded-lg border border-[#14304A]">
+                  <div className="bg-surface-deep p-4 rounded-lg border border-border-input">
                     <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">{booking.notes}</p>
                   </div>
                 </div>

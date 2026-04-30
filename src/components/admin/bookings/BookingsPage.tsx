@@ -191,7 +191,7 @@ export function BookingsPage({ initialBookings, totalCount, currentPage, pageSiz
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-[#FFEE34] text-[#00203C] p-3 rounded-lg flex items-center justify-between shadow-[0_4px_20px_rgba(255,238,52,0.15)]"
+            className="bg-yellow text-navy p-3 rounded-lg flex items-center justify-between shadow-[0_4px_20px_rgba(255,238,52,0.15)]"
           >
             <div className="flex items-center gap-3 font-bold text-sm">
               <AlertTriangle className="w-5 h-5" />
@@ -200,12 +200,12 @@ export function BookingsPage({ initialBookings, totalCount, currentPage, pageSiz
             <div className="flex items-center gap-3">
               <button 
                 onClick={handleBulkConfirm}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00203C] text-white rounded text-xs font-bold hover:bg-[#0A1F33] transition-colors border border-transparent"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-navy text-white rounded text-xs font-bold hover:bg-surface transition-colors border border-transparent"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
                 Confirm Selected
               </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-[#00203C] text-[#00203C] rounded text-xs font-bold hover:bg-[#00203C]/10 transition-colors">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-navy text-navy rounded text-xs font-bold hover:bg-navy/10 transition-colors">
                 <Download className="w-3.5 h-3.5" />
                 Export CSV
               </button>
@@ -224,7 +224,7 @@ export function BookingsPage({ initialBookings, totalCount, currentPage, pageSiz
       </AnimatePresence>
 
       {/* Table Area */}
-      <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-xl border border-border-input overflow-hidden flex flex-col">
         <BookingsTable 
           bookings={bookings}
           selectedRows={selectedRows}

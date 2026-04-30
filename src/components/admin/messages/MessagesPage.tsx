@@ -123,24 +123,24 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
           <h2 className="text-xl font-bold text-white flex items-center gap-3">
             Contact Messages / الرسائل
             {unreadCount > 0 && (
-              <span className="bg-[#FFEE34] text-[#00203C] text-xs px-2 py-0.5 rounded-full">{unreadCount} New</span>
+              <span className="bg-yellow text-navy text-xs px-2 py-0.5 rounded-full">{unreadCount} New</span>
             )}
           </h2>
         </div>
       </div>
 
-      <div className="flex-1 bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden flex shadow-xl">
+      <div className="flex-1 bg-surface rounded-2xl border border-border-input overflow-hidden flex shadow-xl">
         
         {/* Left Panel: List — hidden on mobile when detail is open */}
-        <div className={`w-full lg:w-[35%] lg:min-w-[320px] bg-[#061520] border-r border-[#14304A] flex flex-col h-full ${mobileShowDetail ? 'hidden lg:flex' : 'flex'}`}>
+        <div className={`w-full lg:w-[35%] lg:min-w-[320px] bg-surface-deep border-r border-border-input flex flex-col h-full ${mobileShowDetail ? 'hidden lg:flex' : 'flex'}`}>
           {/* Search & Filters */}
-          <div className="p-4 border-b border-[#14304A] space-y-4">
+          <div className="p-4 border-b border-border-input space-y-4">
             <div className="relative group">
               <Search className="w-4 h-4 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
                 type="text" 
                 placeholder="Search messages..." 
-                className="w-full bg-[#020F1C] text-sm text-white border border-[#14304A] rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-[#FFEE34] transition-all"
+                className="w-full bg-[#020F1C] text-sm text-white border border-border-input rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-yellow transition-all"
               />
             </div>
             <div className="flex gap-2">
@@ -150,8 +150,8 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-1.5 text-xs font-bold rounded-full capitalize transition-colors ${
                     activeTab === tab 
-                      ? "bg-[#FFEE34] text-[#00203C]" 
-                      : "bg-[#0A1F33] text-white/50 hover:text-white border border-[#14304A]"
+                      ? "bg-yellow text-navy" 
+                      : "bg-surface text-white/50 hover:text-white border border-border-input"
                   }`}
                 >
                   {tab}
@@ -169,15 +169,15 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
                     key={msg.id}
                     onClick={() => { setActiveMessageId(msg.id); setMobileShowDetail(true); }}
                     className={`w-full text-left p-4 transition-colors relative flex gap-3 ${
-                      activeMessageId === msg.id ? "bg-[#0A1F33]" : "hover:bg-[#0A1F33]/50"
+                      activeMessageId === msg.id ? "bg-surface" : "hover:bg-surface/50"
                     }`}
                   >
                     {/* Unread indicator */}
                     {!msg.is_read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FFEE34]" />
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow" />
                     )}
                     <div className="mt-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${!msg.is_read ? 'bg-[#FFEE34] text-[#00203C]' : 'bg-[#14304A] text-white/50'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${!msg.is_read ? 'bg-yellow text-navy' : 'bg-border-input text-white/50'}`}>
                         {msg.name.charAt(0)}
                       </div>
                     </div>
@@ -205,11 +205,11 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
         </div>
 
         {/* Right Panel: Detail — hidden on mobile when list is shown */}
-        <div className={`flex-1 bg-[#0A1F33] flex flex-col h-full ${mobileShowDetail ? 'flex' : 'hidden lg:flex'}`}>
+        <div className={`flex-1 bg-surface flex flex-col h-full ${mobileShowDetail ? 'flex' : 'hidden lg:flex'}`}>
           {activeMessage ? (
             <>
               {/* Detail Header */}
-              <div className="p-4 md:p-6 border-b border-[#14304A] bg-[#061520]/50 sticky top-0 flex justify-between items-start gap-4">
+              <div className="p-4 md:p-6 border-b border-border-input bg-surface-deep/50 sticky top-0 flex justify-between items-start gap-4">
                 <div className="flex gap-3 md:gap-4 items-start">
                   {/* Back button — mobile only */}
                   <button
@@ -219,24 +219,24 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
-                  <div className="w-12 h-12 rounded-full bg-[#14304A] flex items-center justify-center text-xl font-bold text-[#FFEE34] flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-border-input flex items-center justify-center text-xl font-bold text-yellow flex-shrink-0">
                     {activeMessage.name.charAt(0)}
                   </div>
                   <div>
                     <h2 className="text-lg md:text-2xl font-bold text-white leading-tight">{activeMessage.name}</h2>
                     <div className="flex items-center gap-4 mt-1 text-sm text-white/60">
-                      <a href={`mailto:${activeMessage.email}`} className="hover:text-[#FFEE34] transition-colors">{activeMessage.email}</a>
+                      <a href={`mailto:${activeMessage.email}`} className="hover:text-yellow transition-colors">{activeMessage.email}</a>
                       {activeMessage.phone && (
                         <>
                           <span className="w-1 h-1 bg-white/20 rounded-full" />
-                          <a href={`tel:${activeMessage.phone}`} className="hover:text-[#FFEE34] transition-colors">{activeMessage.phone}</a>
+                          <a href={`tel:${activeMessage.phone}`} className="hover:text-yellow transition-colors">{activeMessage.phone}</a>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-3 flex-shrink-0">
-                  <div className="flex items-center gap-2 text-xs text-white/50 bg-[#020F1C] px-3 py-1.5 rounded-lg border border-[#14304A]">
+                  <div className="flex items-center gap-2 text-xs text-white/50 bg-[#020F1C] px-3 py-1.5 rounded-lg border border-border-input">
                     <Clock className="w-3.5 h-3.5" />
                     <span>{formatDate(activeMessage.created_at)}</span>
                   </div>
@@ -245,7 +245,7 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
                       <button 
                         onClick={() => handleMarkAsRead(activeMessage)}
                         disabled={loadingIds.has(activeMessage.id)}
-                        className="flex items-center gap-1.5 text-xs font-bold text-[#FFEE34] bg-[#FFEE34]/10 hover:bg-[#FFEE34]/20 border border-[#FFEE34]/30 px-3 py-1.5 rounded transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 text-xs font-bold text-yellow bg-yellow/10 hover:bg-yellow/20 border border-yellow/30 px-3 py-1.5 rounded transition-colors disabled:opacity-50"
                       >
                         {loadingIds.has(activeMessage.id) ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                         Mark as Read
@@ -268,14 +268,14 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
 
               {/* Detail Body */}
               <div className="p-8 flex-1 overflow-y-auto whitespace-pre-wrap text-sm text-white/80 leading-relaxed font-['Cairo']">
-                <h3 className="text-lg font-bold text-white mb-6 border-b border-[#14304A] pb-4">Message</h3>
+                <h3 className="text-lg font-bold text-white mb-6 border-b border-border-input pb-4">Message</h3>
                 {activeMessage.message}
               </div>
             </>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-white/40">
-              <div className="w-24 h-24 bg-[#061520] rounded-full flex items-center justify-center mb-4">
-                <Mail className="w-10 h-10 text-[#14304A]" />
+              <div className="w-24 h-24 bg-surface-deep rounded-full flex items-center justify-center mb-4">
+                <Mail className="w-10 h-10 text-border-input" />
               </div>
               <h3 className="text-xl font-bold text-white mb-1">اختر رسالة لعرضها</h3>
               <p>Select a message from the list to read</p>

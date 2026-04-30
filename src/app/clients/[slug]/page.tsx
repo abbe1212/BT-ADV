@@ -6,9 +6,8 @@ import Navbar from "@/components/layout/Navbar";
 import WorksGrid from "@/components/works/WorksGrid";
 import ReviewsSection from "@/components/reviews/ReviewsSection";
 import { getClients, getClientWithRelations } from "@/lib/supabase/queries";
-import { createClient } from "@supabase/supabase-js";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 // Allow slugs not pre-rendered at build time to be rendered on-demand
 export const dynamicParams = true;
 
@@ -107,7 +106,7 @@ export default async function ClientDetailPage({ params }: Props) {
             )}
             <span className="bg-yellow/10 border border-yellow/20 text-yellow px-4 py-1.5 rounded-full uppercase tracking-widest font-bold flex items-center gap-2">
               <Film className="w-4 h-4" />
-              {works.length} أعمال معاً
+              {works.length} Works Together
             </span>
           </div>
         </div>
@@ -126,10 +125,9 @@ export default async function ClientDetailPage({ params }: Props) {
       {/* Works Section */}
       <section className="w-full max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-16">
-           <h2 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-widest font-[fantasy] mb-2 drop-shadow-lg">
-             أعمالنا معاً
+           <h2 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-widest font-display mb-2 drop-shadow-lg">
+             Our Work Together
            </h2>
-           <p className="text-yellow tracking-[0.3em] uppercase text-xs md:text-sm">Our Work Together</p>
         </div>
 
         {works.length > 0 ? (
@@ -150,8 +148,8 @@ export default async function ClientDetailPage({ params }: Props) {
       {reviews.length > 0 && (
         <ReviewsSection 
           reviews={reviews} 
-          title="ماذا قالوا" 
-          subtitle="What They Said" 
+          title="What They Said" 
+          subtitle="Testimonials from our partners" 
           hideClient={true} // Since we are on their page, no need to show their own logo on the review card
         />
       )}
@@ -160,12 +158,10 @@ export default async function ClientDetailPage({ params }: Props) {
       <section className="w-full bg-yellow py-16 px-4 mt-20 relative overflow-hidden">
         {/* Subtle patterned background or noise could go here */}
         <div className="w-full max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
-           <h2 className="text-3xl md:text-5xl font-bold text-navy uppercase tracking-widest font-[fantasy] mb-6">
+           <h2 className="text-3xl md:text-5xl font-bold text-navy uppercase tracking-widest font-display mb-6">
              Ready for your next masterpiece?
            </h2>
-           <p className="text-navy/70 uppercase tracking-widest font-bold mb-10 arabic-font">
-             احجز إعلانك معانا الآن
-           </p>
+
            <Link 
              href="/booking"
              className="bg-navy text-yellow px-10 py-5 rounded-md font-bold uppercase tracking-widest hover:scale-105 hover:shadow-2xl transition-all duration-300 text-lg"

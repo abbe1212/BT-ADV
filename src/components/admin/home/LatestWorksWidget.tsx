@@ -6,13 +6,13 @@ import type { Work } from "@/lib/supabase/types";
 
 export function LatestWorksWidget({ recentWorks }: { recentWorks: Work[] }) {
   return (
-    <div className="bg-[#0A1F33] rounded-xl border border-[#14304A] p-5">
+    <div className="bg-surface rounded-xl border border-border-input p-5">
       <div className="flex justify-between items-end mb-6">
         <div>
           <h2 className="text-lg font-bold text-white mb-1">Latest Works Added</h2>
           <p className="text-xs text-white/50 uppercase tracking-wide">أحدث الأعمال</p>
         </div>
-        <Link href="/admin/works" className="text-sm text-[#00203C] bg-[#FFEE34] px-4 py-1.5 rounded-lg font-bold hover:bg-white transition-colors">
+        <Link href="/admin/works" className="text-sm text-navy bg-yellow px-4 py-1.5 rounded-lg font-bold hover:bg-white transition-colors">
           Manage Works
         </Link>
       </div>
@@ -25,7 +25,7 @@ export function LatestWorksWidget({ recentWorks }: { recentWorks: Work[] }) {
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {recentWorks.map((work) => (
-            <div key={work.id} className="relative aspect-video rounded-lg overflow-hidden group bg-[#020F1C] border border-[#14304A]">
+            <div key={work.id} className="relative aspect-video rounded-lg overflow-hidden group bg-[#020F1C] border border-border-input">
               {work.image_url ? (
                 <Image 
                   src={work.image_url} 
@@ -42,7 +42,7 @@ export function LatestWorksWidget({ recentWorks }: { recentWorks: Work[] }) {
                 </>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-3">
-                <span className="text-[10px] font-bold text-[#FFEE34] uppercase mb-0.5">{work.category}</span>
+                <span className="text-[10px] font-bold text-yellow uppercase mb-0.5">{work.category}</span>
                 <h4 className="text-white text-sm font-bold truncate">{work.title_ar}</h4>
               </div>
             </div>

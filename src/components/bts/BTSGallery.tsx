@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import Image from "next/image";
 import type { BtsItem } from "@/lib/supabase/types";
 
 const containerVariants = {
@@ -56,12 +57,13 @@ export default function BTSGallery({ media }: Props) {
             >
               {item.media_type === "image" ? (
                 <div className="relative w-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={item.media_url}
                     alt={item.title_en ?? item.title_ar ?? `BTS ${index + 1}`}
+                    width={0}
+                    height={0}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
                   />
                 </div>
               ) : (
@@ -99,6 +101,9 @@ export default function BTSGallery({ media }: Props) {
       <AnimatePresence>
         {lightboxIndex !== null && current && (
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Behind the scenes media lightbox"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -125,11 +130,14 @@ export default function BTSGallery({ media }: Props) {
               onClick={(e) => e.stopPropagation()}
             >
               {current.media_type === "image" ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={current.media_url}
                   alt={current.title_en ?? current.title_ar ?? `BTS ${lightboxIndex + 1}`}
-                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-[0_0_80px_rgba(0,0,0,0.8)]"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="max-w-full object-contain rounded-lg shadow-[0_0_80px_rgba(0,0,0,0.8)]"
+                  style={{ width: "auto", height: "auto", maxHeight: "85vh" }}
                 />
               ) : (
                 <video
@@ -155,8 +163,13 @@ export default function BTSGallery({ media }: Props) {
                   className={`flex-shrink-0 w-10 h-10 rounded overflow-hidden border-2 transition-all duration-200 ${i === lightboxIndex ? "border-yellow scale-110" : "border-transparent opacity-40 hover:opacity-70"}`}
                 >
                   {item.media_type === "image" ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.media_url} alt="" className="w-full h-full object-cover" />
+                    <Image
+                      src={item.media_url}
+                      alt={item.title_en ?? item.title_ar ?? `Thumbnail ${i + 1}`}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-white/10 flex items-center justify-center">
                       <Play size={12} className="text-white" />

@@ -4,7 +4,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { ArrowRight, Briefcase } from "lucide-react";
 import { getCareers } from "@/lib/supabase/queries";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Careers — BT ADV",
@@ -15,12 +15,12 @@ export default async function CareersPage() {
   const jobs = await getCareers(true);
 
   return (
-    <main className="min-h-screen bg-navy flex flex-col items-center">
+    <main id="main-content" className="min-h-screen bg-navy flex flex-col items-center">
       <Navbar />
 
       <div className="w-full relative mt-24 py-20 bg-navy flex items-center justify-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow/10 rounded-full blur-[100px] pointer-events-none" />
-        <h1 className="relative z-10 text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-[fantasy]">
+        <h1 className="relative z-10 text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-display">
           Join Our Crew
         </h1>
       </div>

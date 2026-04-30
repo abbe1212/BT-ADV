@@ -58,17 +58,17 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#00203C] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-navy flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-black text-white mb-2 tracking-wider">BT-ADV</h1>
-          <div className="w-20 h-1 bg-[#FFEE34] mx-auto mb-4"></div>
+          <div className="w-20 h-1 bg-yellow mx-auto mb-4"></div>
           <p className="text-white/60 text-sm uppercase tracking-widest">Admin Portal</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-border-input overflow-hidden">
           <div className="p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Sign In</h2>
 
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 focus:border-[#FFEE34] focus:outline-none transition-colors"
+                  className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 focus:border-yellow focus:outline-none transition-colors"
                   placeholder="admin@example.com"
                   required
                   disabled={loading}
@@ -99,7 +99,7 @@ export default function AdminLoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-3 pr-12 focus:border-[#FFEE34] focus:outline-none transition-colors"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-3 pr-12 focus:border-yellow focus:outline-none transition-colors"
                     placeholder="••••••••"
                     required
                     disabled={loading}
@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FFEE34] text-[#00203C] py-3 rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-yellow text-navy py-3 rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -145,7 +145,7 @@ export default function AdminLoginPage() {
           </div>
 
           {/* Footer */}
-          <div className="bg-[#061520] border-t border-[#14304A] p-4 text-center">
+          <div className="bg-surface-deep border-t border-border-input p-4 text-center">
             <p className="text-white/40 text-xs">
               Admin access only. Unauthorized access is prohibited.
             </p>

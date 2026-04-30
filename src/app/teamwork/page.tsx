@@ -5,7 +5,7 @@ import Image from "next/image";
 import { getTeam } from "@/lib/supabase/queries";
 import { Users } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata = {
   title: "The Crew — BT ADV",
@@ -16,12 +16,12 @@ export default async function TeamworkPage() {
   const members = await getTeam();
 
   return (
-    <main className="min-h-screen bg-navy flex flex-col items-center">
+    <main id="main-content" className="min-h-screen bg-navy flex flex-col items-center">
       <Navbar />
 
-      <div className="w-full h-[40vh] relative flex items-center justify-center overflow-hidden bg-[#0c131f] border-b border-navy-light mt-24">
+      <div className="w-full h-[40vh] relative flex items-center justify-center overflow-hidden bg-surface border-b border-navy-light mt-24">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#FFEE34_1px,transparent_1px)] [background-size:40px_40px]" />
-        <h1 className="text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-[fantasy] z-10 drop-shadow-[0_0_15px_rgba(255,238,52,0.5)]">
+        <h1 className="text-4xl md:text-6xl font-bold text-yellow uppercase tracking-widest font-display z-10 drop-shadow-[0_0_15px_rgba(255,238,52,0.5)]">
           The Crew
         </h1>
       </div>

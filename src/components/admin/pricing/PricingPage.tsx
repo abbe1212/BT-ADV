@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Plus, GripVertical, Edit2, Trash2, X, Star, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalFocus } from "@/hooks/useModalFocus";
 import type { Pricing } from "@/lib/supabase/types";
 import { insertPricing, updatePricing, deletePricing, type PricingInsert } from "@/actions/pricing";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
@@ -88,6 +89,8 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
     setFormData(emptyForm);
   };
 
+  const modalRef = useModalFocus({ isOpen: isModalOpen, onClose: closeModal });
+
   const handleChange = (field: keyof FormData, value: string | number | boolean | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -154,7 +157,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center bg-[#0A1F33] p-6 rounded-2xl border border-[#14304A]">
+      <div className="flex justify-between items-center bg-surface p-6 rounded-2xl border border-border-input">
         <div>
           <div className="text-xs text-white/50 mb-1 flex items-center gap-2">
             <span>Admin Dashboard</span>
@@ -166,7 +169,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
         </div>
         <button 
           onClick={() => openModal()}
-          className="flex items-center gap-2 bg-[#FFEE34] text-[#00203C] hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
+          className="flex items-center gap-2 bg-yellow text-navy hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
         >
           <Plus className="w-5 h-5" />
           <span>Add New Package</span>
@@ -177,13 +180,13 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
         const categoryPackages = packages.filter(p => p.category === category).sort((a,b) => a.order_index - b.order_index);
         
         return (
-          <div key={category} className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-[#14304A] bg-[#061520] relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FFEE34]" />
-              <h3 className="text-lg font-bold text-[#FFEE34] ml-2">{category}</h3>
+          <div key={category} className="bg-surface rounded-2xl border border-border-input overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-border-input bg-surface-deep relative">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow" />
+              <h3 className="text-lg font-bold text-yellow ml-2">{category}</h3>
               <button 
                 onClick={() => openModal(undefined, category)}
-                className="flex items-center gap-1.5 text-xs font-bold text-white/80 border border-[#14304A] hover:bg-[#FFEE34] hover:text-[#00203C] hover:border-[#FFEE34] transition-colors px-3 py-1.5 rounded-lg"
+                className="flex items-center gap-1.5 text-xs font-bold text-white/80 border border-border-input hover:bg-yellow hover:text-navy hover:border-yellow transition-colors px-3 py-1.5 rounded-lg"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Package
@@ -193,7 +196,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
             <div className="p-0">
               {categoryPackages.length > 0 ? (
                 <table className="w-full text-sm text-left">
-                  <thead className="text-[11px] text-white/50 uppercase bg-[#020F1C]/50 border-b border-[#14304A]">
+                  <thead className="text-[11px] text-white/50 uppercase bg-[#020F1C]/50 border-b border-border-input">
                     <tr>
                       <th className="px-4 py-3 w-10"></th>
                       <th className="px-4 py-3 font-medium">Title AR</th>
@@ -210,7 +213,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                         className={`hover:bg-[#0d2538] transition-colors group ${deletingId === pkg.id ? "opacity-50 pointer-events-none" : ""}`}
                       >
                         <td className="px-4 py-3">
-                          <button className="text-white/20 hover:text-[#FFEE34] cursor-grab active:cursor-grabbing">
+                          <button className="text-white/20 hover:text-yellow cursor-grab active:cursor-grabbing">
                             <GripVertical className="w-4 h-4" />
                           </button>
                         </td>
@@ -218,13 +221,13 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                         <td className="px-4 py-3 text-white/80">{pkg.title_en}</td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col">
-                            <span className="font-bold text-[#FFEE34]">{pkg.price_from.toLocaleString()} – {pkg.price_to ? pkg.price_to.toLocaleString() : '+'} EGP</span>
+                            <span className="font-bold text-yellow">{pkg.price_from.toLocaleString()} – {pkg.price_to ? pkg.price_to.toLocaleString() : '+'} EGP</span>
                             <span className="text-[10px] text-white/40">{pkg.price_note}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           {pkg.is_popular && (
-                            <span className="inline-flex items-center gap-1 bg-[#FFEE34]/10 text-[#FFEE34] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#FFEE34]/20 uppercase">
+                            <span className="inline-flex items-center gap-1 bg-yellow/10 text-yellow text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow/20 uppercase">
                               <Star className="w-3 h-3" /> Popular
                             </span>
                           )}
@@ -232,7 +235,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                         <td className="px-4 py-3 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                            <button 
                              onClick={() => openModal(pkg)}
-                             className="p-1.5 bg-[#14304A] text-white hover:bg-[#FFEE34] hover:text-[#00203C] rounded transition-colors"
+                             className="p-1.5 bg-border-input text-white hover:bg-yellow hover:text-navy rounded transition-colors"
                            >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -264,14 +267,19 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
             
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-[#0A1F33] rounded-2xl overflow-hidden shadow-2xl border-t-4 border-[#FFEE34] flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-[#14304A] bg-[#061520]">
-                <h3 className="text-xl font-bold text-white">
+            <motion.div
+              ref={modalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="pricing-modal-title"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-surface rounded-2xl overflow-hidden shadow-2xl border-t-4 border-yellow flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-border-input bg-surface-deep">
+                <h3 id="pricing-modal-title" className="text-xl font-bold text-white">
                   {editingItem?.id ? "Edit Package" : "Add New Package"}
                 </h3>
-                <button onClick={closeModal} className="text-white/50 hover:text-white transition-colors bg-[#0A1F33] p-1.5 rounded-lg border border-[#14304A]">
+                <button onClick={closeModal} aria-label="Close dialog" className="text-white/50 hover:text-white transition-colors bg-surface p-1.5 rounded-lg border border-border-input">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -284,7 +292,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       type="text" 
                       value={formData.title_en}
                       onChange={(e) => handleChange('title_en', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                   <div className="space-y-1.5 text-right">
@@ -293,7 +301,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       type="text" dir="rtl" 
                       value={formData.title_ar}
                       onChange={(e) => handleChange('title_ar', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                 </div>
@@ -303,7 +311,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                   <select 
                     value={formData.category}
                     onChange={(e) => handleChange('category', e.target.value)}
-                    className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none appearance-none"
+                    className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none appearance-none"
                   >
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -316,7 +324,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       type="number" 
                       value={formData.price_from}
                       onChange={(e) => handleChange('price_from', parseInt(e.target.value) || 0)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -325,7 +333,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       type="number" 
                       value={formData.price_to ?? ""}
                       onChange={(e) => handleChange('price_to', e.target.value ? parseInt(e.target.value) : null)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                 </div>
@@ -336,7 +344,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                     type="text" 
                     value={formData.price_note}
                     onChange={(e) => handleChange('price_note', e.target.value)}
-                    className="w-full bg-[#061520] text-white/70 border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                    className="w-full bg-surface-deep text-white/70 border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                   />
                 </div>
                 
@@ -347,7 +355,7 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       id="popular" 
                       checked={formData.is_popular}
                       onChange={(e) => handleChange('is_popular', e.target.checked)}
-                      className="w-5 h-5 accent-[#FFEE34] bg-[#061520] border-[#14304A] rounded" 
+                      className="w-5 h-5 accent-yellow bg-surface-deep border-border-input rounded" 
                     />
                     <label htmlFor="popular" className="font-bold text-white text-sm select-none">Is Popular Package</label>
                   </div>
@@ -357,18 +365,18 @@ export function PricingPage({ initialPricing }: PricingPageProps) {
                       type="number" 
                       value={formData.order_index}
                       onChange={(e) => handleChange('order_index', parseInt(e.target.value) || 0)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-3 py-1.5 focus:border-[#FFEE34] focus:outline-none text-sm" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-3 py-1.5 focus:border-yellow focus:outline-none text-sm" 
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 border-t border-[#14304A] bg-[#061520] flex justify-end gap-3">
+              <div className="p-5 border-t border-border-input bg-surface-deep flex justify-end gap-3">
                 <button onClick={closeModal} disabled={isSaving} className="px-6 py-2.5 text-white/70 hover:text-white font-bold transition-colors disabled:opacity-50">Cancel</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-8 py-2.5 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-8 py-2.5 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isSaving ? "Saving..." : "Save Changes"}

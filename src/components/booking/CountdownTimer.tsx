@@ -39,7 +39,7 @@ export default function CountdownTimer({ targetDate }: { targetDate: Date }) {
   if (hasPassed) {
     return (
       <div className="text-center mt-6 p-4 rounded bg-yellow/10 border border-yellow/20">
-        <p className="text-yellow text-lg font-bold uppercase tracking-widest font-[fantasy]">
+        <p className="text-yellow text-lg font-bold uppercase tracking-widest font-display">
           Time to create something great! 🎬
         </p>
       </div>

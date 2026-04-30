@@ -3,6 +3,8 @@
 import React, { useState, useCallback } from "react";
 import { Plus, Edit2, Trash2, X, Star, Loader2, MessageSquareQuote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalFocus } from "@/hooks/useModalFocus";
+import Image from "next/image";
 import type { Review, Client } from "@/lib/supabase/types";
 import { insertReview, updateReview, deleteReview } from "@/actions/reviews";
 import type { ReviewInsert, ReviewUpdate } from "@/actions/reviews";
@@ -100,6 +102,8 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
     setTimeout(resetForm, 300);
   };
 
+  const modalRef = useModalFocus({ isOpen: isModalOpen, onClose: closeModal });
+
   const handleSubmit = async () => {
     if (!formData.client_id) {
       toast.error('Please select a client');
@@ -185,7 +189,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center bg-[#0A1F33] p-6 rounded-2xl border border-[#14304A]">
+      <div className="flex justify-between items-center bg-surface p-6 rounded-2xl border border-border-input">
         <div>
           <div className="text-xs text-white/50 mb-1 flex items-center gap-2">
             <span>Admin Dashboard</span>
@@ -197,7 +201,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
         </div>
         <button 
           onClick={openAddModal}
-          className="flex items-center gap-2 bg-[#FFEE34] text-[#00203C] hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
+          className="flex items-center gap-2 bg-yellow text-navy hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
         >
           <Plus className="w-5 h-5" />
           <span>Add Review</span>
@@ -205,7 +209,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
       </div>
 
       {/* Table view */}
-      <div className="bg-[#0A1F33] rounded-2xl border border-[#14304A] overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-border-input overflow-hidden">
         {reviews.length === 0 ? (
           <div className="text-center py-16">
             <MessageSquareQuote className="w-12 h-12 text-white/20 mx-auto mb-4" />
@@ -214,7 +218,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-white/80">
-              <thead className="bg-[#061520] text-xs uppercase text-white/50 border-b border-[#14304A]">
+              <thead className="bg-surface-deep text-xs uppercase text-white/50 border-b border-border-input">
                 <tr>
                   <th className="px-6 py-4 font-medium">Reviewer</th>
                   <th className="px-6 py-4 font-medium">Client</th>
@@ -229,7 +233,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                   const client = review.clients || clients.find(c => c.id === review.client_id);
                   
                   return (
-                    <tr key={review.id} className={`hover:bg-[#061520] transition-colors ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <tr key={review.id} className={`hover:bg-surface-deep transition-colors ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="font-bold text-white">{review.reviewer_name}</div>
                         {review.reviewer_role && <div className="text-xs text-white/50">{review.reviewer_role}</div>}
@@ -237,13 +241,12 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {client?.logo_url && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={client.logo_url} alt={client.name} className="w-6 h-6 object-contain" />
+                            <Image src={client.logo_url} alt={client.name} width={24} height={24} className="object-contain" />
                           )}
                           <span>{client?.name || 'Unknown Client'}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center text-[#FFEE34]">
+                      <td className="px-6 py-4 text-center text-yellow">
                         <div className="flex items-center justify-center gap-0.5">
                           {review.rating} <Star className="w-3.5 h-3.5 fill-current" />
                         </div>
@@ -251,16 +254,16 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => toggleFeatured(review)}
-                          className={`w-10 h-5 rounded-full relative transition-colors ${review.is_featured ? 'bg-[#FFEE34]' : 'bg-[#14304A]'}`}
+                          className={`w-10 h-5 rounded-full relative transition-colors ${review.is_featured ? 'bg-yellow' : 'bg-border-input'}`}
                         >
-                          <div className={`w-4 h-4 bg-[#00203C] rounded-full absolute top-0.5 transition-transform ${review.is_featured ? 'translate-x-5' : 'translate-x-0.5 bg-white'}`} />
+                          <div className={`w-4 h-4 bg-navy rounded-full absolute top-0.5 transition-transform ${review.is_featured ? 'translate-x-5' : 'translate-x-0.5 bg-white'}`} />
                         </button>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEditModal(review)}
-                            className="p-1.5 rounded-lg bg-[#14304A] text-white hover:bg-[#FFEE34] hover:text-[#00203C] transition-colors"
+                            className="p-1.5 rounded-lg bg-border-input text-white hover:bg-yellow hover:text-navy transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -287,14 +290,19 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
       <AnimatePresence>
         {isModalOpen && (
            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-[#020F1C]/80 backdrop-blur-sm" />
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-[#020F1C]/80 backdrop-blur-sm" aria-hidden="true" />
            
-           <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-2xl bg-[#0A1F33] rounded-2xl overflow-hidden shadow-2xl border-t-4 border-[#FFEE34] flex flex-col max-h-[90vh]">
-             <div className="flex items-center justify-between p-6 border-b border-[#14304A] bg-[#061520] flex-shrink-0">
-               <h3 className="text-xl font-bold text-white">
+           <motion.div
+             ref={modalRef}
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="reviews-modal-title"
+             initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-2xl bg-surface rounded-2xl overflow-hidden shadow-2xl border-t-4 border-yellow flex flex-col max-h-[90vh]">
+             <div className="flex items-center justify-between p-6 border-b border-border-input bg-surface-deep flex-shrink-0">
+               <h3 id="reviews-modal-title" className="text-xl font-bold text-white">
                  {editingItem ? 'Edit Review' : 'Add Review'}
                </h3>
-               <button onClick={closeModal} className="text-white/50 hover:text-white transition-colors bg-[#0A1F33] p-1.5 rounded-lg border border-[#14304A]">
+               <button onClick={closeModal} aria-label="Close dialog" className="text-white/50 hover:text-white transition-colors bg-surface p-1.5 rounded-lg border border-border-input">
                  <X className="w-5 h-5" />
                </button>
              </div>
@@ -308,7 +316,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                      type="text"
                      value={formData.reviewer_name}
                      onChange={(e) => setFormData({ ...formData, reviewer_name: e.target.value })}
-                     className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none"
+                     className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none"
                      placeholder="e.g. Ahmed Hassan"
                    />
                  </div>
@@ -318,7 +326,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                      type="text"
                      value={formData.reviewer_role}
                      onChange={(e) => setFormData({ ...formData, reviewer_role: e.target.value })}
-                     className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none"
+                     className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none"
                      placeholder="e.g. Marketing Director"
                    />
                  </div>
@@ -329,7 +337,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                  <select
                    value={formData.client_id}
                    onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                   className="w-full bg-[#061520] text-white/90 border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none appearance-none cursor-pointer"
+                   className="w-full bg-surface-deep text-white/90 border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none appearance-none cursor-pointer"
                  >
                    <option value="">Select a Client...</option>
                    {clients.map(client => (
@@ -345,7 +353,7 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                    onChange={(e) => setFormData({ ...formData, content_ar: e.target.value })}
                    dir="rtl"
                    rows={4}
-                   className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none text-right"
+                   className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none text-right"
                    placeholder="التقييم بالعربي..."
                  />
                </div>
@@ -356,12 +364,12 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                    value={formData.content_en}
                    onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
                    rows={3}
-                   className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none"
+                   className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none"
                    placeholder="English review..."
                  />
                </div>
 
-               <div className="grid grid-cols-3 gap-4 pt-2 border-t border-[#14304A]">
+               <div className="grid grid-cols-3 gap-4 pt-2 border-t border-border-input">
                  <div className="space-y-2">
                    <label className="text-sm font-bold text-white block">Rating</label>
                    <div className="flex items-center gap-1">
@@ -371,19 +379,19 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                          onClick={() => setFormData({ ...formData, rating: star })}
                          className="focus:outline-none transition-transform hover:scale-110"
                        >
-                         <Star className={`w-6 h-6 ${star <= formData.rating ? 'fill-[#FFEE34] text-[#FFEE34]' : 'text-white/20'}`} />
+                         <Star className={`w-6 h-6 ${star <= formData.rating ? 'fill-[#FFEE34] text-yellow' : 'text-white/20'}`} />
                        </button>
                      ))}
                    </div>
                  </div>
 
-                 <div className="space-y-2 flex flex-col items-center justify-center border-l border-r border-[#14304A]">
-                   <label className="text-sm font-bold text-white cursor-pointer hover:text-[#FFEE34] transition-colors flex items-center gap-2">
+                 <div className="space-y-2 flex flex-col items-center justify-center border-l border-r border-border-input">
+                   <label className="text-sm font-bold text-white cursor-pointer hover:text-yellow transition-colors flex items-center gap-2">
                      <input
                        type="checkbox"
                        checked={formData.is_featured}
                        onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                       className="w-4 h-4 accent-[#FFEE34]"
+                       className="w-4 h-4 accent-yellow"
                      />
                      Mark Featured
                    </label>
@@ -396,25 +404,25 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
                      type="number"
                      value={formData.order_index}
                      onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
-                     className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-3 py-1.5 focus:border-[#FFEE34] focus:outline-none text-sm block"
+                     className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-3 py-1.5 focus:border-yellow focus:outline-none text-sm block"
                    />
                  </div>
                </div>
 
              </div>
 
-             <div className="p-5 border-t border-[#14304A] bg-[#061520] flex justify-end gap-3 flex-shrink-0">
+             <div className="p-5 border-t border-border-input bg-surface-deep flex justify-end gap-3 flex-shrink-0">
                <button
                  onClick={closeModal}
                  disabled={isSubmitting}
-                 className="px-6 py-2.5 text-[#FFEE34] border border-[#FFEE34] hover:bg-[#FFEE34]/10 rounded-lg font-bold transition-colors disabled:opacity-50"
+                 className="px-6 py-2.5 text-yellow border border-yellow hover:bg-yellow/10 rounded-lg font-bold transition-colors disabled:opacity-50"
                >
                  Cancel
                </button>
                <button
                  onClick={handleSubmit}
                  disabled={isSubmitting}
-                 className="px-8 py-2.5 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                 className="px-8 py-2.5 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
                >
                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                  {editingItem ? 'Update Review' : 'Save Review'}

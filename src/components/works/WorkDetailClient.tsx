@@ -102,7 +102,7 @@ export default function WorkDetailClient({ work, nextWork }: Props) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-widest font-[fantasy] text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+            className="text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-widest font-display text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
           >
             {work.title_en ?? work.title_ar}
           </motion.h1>

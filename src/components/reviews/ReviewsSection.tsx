@@ -13,7 +13,7 @@ interface Props {
 
 export default function ReviewsSection({ 
   reviews, 
-  title = "ماذا قالوا / What They Said", 
+  title = "What They Said", 
   subtitle = "Testimonials from our partners",
   hideClient = false
 }: Props) {

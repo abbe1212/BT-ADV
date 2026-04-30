@@ -37,7 +37,7 @@ export function PaginationControls({
   };
 
   return (
-    <div className="px-4 py-3 border-t border-[#14304A] bg-[#061520] flex items-center justify-between gap-4 flex-wrap text-sm">
+    <div className="px-4 py-3 border-t border-border-input bg-surface-deep flex items-center justify-between gap-4 flex-wrap text-sm">
       {/* Entry count */}
       <span className="text-white/50">
         Showing <span className="text-white font-bold">{from}</span> – <span className="text-white font-bold">{to}</span> of{' '}
@@ -50,7 +50,7 @@ export function PaginationControls({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="w-8 h-8 flex items-center justify-center rounded border border-[#14304A] text-white/50 hover:text-white hover:border-[#FFEE34] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded border border-border-input text-white/50 hover:text-white hover:border-yellow transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Previous page"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -68,8 +68,8 @@ export function PaginationControls({
               onClick={() => onPageChange(p as number)}
               className={`w-8 h-8 flex items-center justify-center rounded text-sm font-bold transition-colors ${
                 p === currentPage
-                  ? 'bg-[#FFEE34] text-[#00203C]'
-                  : 'border border-[#14304A] text-white/50 hover:text-white hover:border-[#FFEE34]'
+                  ? 'bg-yellow text-navy'
+                  : 'border border-border-input text-white/50 hover:text-white hover:border-yellow'
               }`}
               aria-current={p === currentPage ? 'page' : undefined}
             >
@@ -82,7 +82,7 @@ export function PaginationControls({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="w-8 h-8 flex items-center justify-center rounded border border-[#14304A] text-white/50 hover:text-white hover:border-[#FFEE34] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded border border-border-input text-white/50 hover:text-white hover:border-yellow transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Next page"
         >
           <ChevronRight className="w-4 h-4" />

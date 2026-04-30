@@ -171,7 +171,7 @@ export async function POST(req: Request) {
     // ── Rate limiting ─────────────────────────────────────────────────────────
     // 5 booking attempts per IP per 10 minutes — prevents slot exhaustion & email abuse.
     const ip = getClientIp(req);
-    const rl = rateLimit(`booking:${ip}`, { limit: 5, windowMs: 10 * 60 * 1_000 });
+    const rl = await rateLimit(`booking:${ip}`, { limit: 5, windowMs: 10 * 60 * 1_000 });
     if (!rl.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please wait before submitting again.' },

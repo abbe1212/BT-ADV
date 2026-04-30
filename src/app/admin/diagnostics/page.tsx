@@ -231,7 +231,7 @@ export default function DiagnosticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#00203C] p-8">
+    <div className="min-h-screen bg-navy p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">🔍 Admin Panel Diagnostics</h1>
@@ -239,8 +239,8 @@ export default function DiagnosticsPage() {
         </div>
 
         {loading ? (
-          <div className="bg-[#0A1F33] border border-[#14304A] rounded-xl p-8 text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-[#FFEE34] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="bg-surface border border-border-input rounded-xl p-8 text-center">
+            <div className="animate-spin w-12 h-12 border-4 border-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-white/60">Running diagnostics...</p>
           </div>
         ) : (
@@ -265,14 +265,14 @@ export default function DiagnosticsPage() {
               </div>
             ))}
 
-            <div className="bg-[#0A1F33] border border-[#14304A] rounded-xl p-6 mt-8">
+            <div className="bg-surface border border-border-input rounded-xl p-6 mt-8">
               <h3 className="font-bold text-white text-lg mb-4">📚 Next Steps</h3>
               <div className="space-y-2 text-white/80">
                 <p>If you see errors above, follow these guides:</p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li><code className="text-[#FFEE34]">SETUP.md</code> - Complete setup guide</li>
-                  <li><code className="text-[#FFEE34]">TROUBLESHOOTING.md</code> - Fix common issues</li>
-                  <li><code className="text-[#FFEE34]">supabase-rls-policies.sql</code> - RLS policies to apply</li>
+                  <li><code className="text-yellow">SETUP.md</code> - Complete setup guide</li>
+                  <li><code className="text-yellow">TROUBLESHOOTING.md</code> - Fix common issues</li>
+                  <li><code className="text-yellow">supabase-rls-policies.sql</code> - RLS policies to apply</li>
                 </ul>
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function DiagnosticsPage() {
                   setLoading(true);
                   runDiagnostics();
                 }}
-                className="bg-[#FFEE34] text-[#00203C] px-6 py-3 rounded-lg font-bold hover:bg-white transition-colors"
+                className="bg-yellow text-navy px-6 py-3 rounded-lg font-bold hover:bg-white transition-colors"
               >
                 🔄 Re-run Diagnostics
               </button>

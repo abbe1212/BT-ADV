@@ -38,14 +38,14 @@ export function BookingsTable({
   return (
     <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
       <table className="w-full min-w-[800px] text-sm text-left">
-        <thead className="text-[11px] text-white/50 uppercase tracking-wider bg-[#061520] border-b border-[#14304A]">
+        <thead className="text-[11px] text-white/50 uppercase tracking-wider bg-surface-deep border-b border-border-input">
           <tr>
             <th className="px-4 py-3 cursor-pointer">
               <input 
                 type="checkbox" 
                 onChange={(e) => onSelectAll(e.target.checked)}
                 checked={selectedRows.length === bookings.length && bookings.length > 0}
-                className="accent-[#FFEE34] w-4 h-4 rounded cursor-pointer"
+                className="accent-yellow w-4 h-4 rounded cursor-pointer"
               />
             </th>
             <th className="px-4 py-3 font-medium">Ref</th>
@@ -70,7 +70,7 @@ export function BookingsTable({
                   key={booking.ref_code}
                   onClick={(e) => handleRowClick(booking.id, e)} 
                   className={`transition-colors group min-h-[64px] cursor-pointer ${
-                    isSelected ? "bg-[#FFEE34]/5" : "hover:bg-[#0d2538]"
+                    isSelected ? "bg-yellow/5" : "hover:bg-[#0d2538]"
                   } ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
                 >
                   <td className="px-4 py-3">
@@ -78,10 +78,10 @@ export function BookingsTable({
                       type="checkbox" 
                       checked={isSelected}
                       onChange={() => onSelectRow(booking.ref_code)}
-                      className="accent-[#FFEE34] w-4 h-4 rounded cursor-pointer"
+                      className="accent-yellow w-4 h-4 rounded cursor-pointer"
                     />
                   </td>
-                  <td className="px-4 py-3 font-mono font-medium text-white group-hover:text-[#FFEE34] transition-colors">
+                  <td className="px-4 py-3 font-mono font-medium text-white group-hover:text-yellow transition-colors">
                     {booking.ref_code}
                   </td>
                   <td className="px-4 py-3">
@@ -99,7 +99,7 @@ export function BookingsTable({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-[#FFEE34] font-semibold">{booking.time_slot || '—'}</span>
+                    <span className="text-yellow font-semibold">{booking.time_slot || '—'}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
@@ -170,8 +170,8 @@ export function BookingsTable({
             <tr>
               <td colSpan={9} className="py-20 text-center">
                 <div className="flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 bg-[#061520] rounded-full flex items-center justify-center mb-4">
-                    <CalendarDays className="w-8 h-8 text-[#14304A]" />
+                  <div className="w-16 h-16 bg-surface-deep rounded-full flex items-center justify-center mb-4">
+                    <CalendarDays className="w-8 h-8 text-border-input" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">لا توجد حجوزات بعد</h3>
                   <p className="text-white/50 text-sm">No bookings found.</p>

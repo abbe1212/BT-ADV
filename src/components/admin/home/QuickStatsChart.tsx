@@ -8,7 +8,7 @@ interface QuickStatsChartProps {
 
 export function QuickStatsChart({ phonePercent, zoomPercent, totalByType }: QuickStatsChartProps) {
   return (
-    <div className="lg:col-span-5 xl:col-span-4 bg-[#0A1F33] rounded-xl border border-[#14304A] p-5 flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="lg:col-span-5 xl:col-span-4 bg-surface rounded-xl border border-border-input p-5 flex flex-col items-center justify-center relative overflow-hidden">
       <div className="absolute top-5 left-5">
         <h2 className="text-lg font-bold text-white mb-1">Booking Types</h2>
         <p className="text-xs text-white/50 uppercase tracking-wide">أنواع الحجوزات</p>
@@ -29,7 +29,7 @@ export function QuickStatsChart({ phonePercent, zoomPercent, totalByType }: Quic
       
       <div className="mt-8 flex gap-6 text-sm w-full justify-center">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#FFEE34]"></div>
+          <div className="w-3 h-3 rounded-full bg-yellow"></div>
           <span className="text-white/80">Phone ({phonePercent}%)</span>
         </div>
         <div className="flex items-center gap-2">

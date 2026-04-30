@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Plus, Edit2, Trash2, X, Star, Camera, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalFocus } from "@/hooks/useModalFocus";
 import Image from "next/image";
 import type { TeamMember } from "@/lib/supabase/types";
 import { insertTeamMember, updateTeamMember, deleteTeamMember, type TeamMemberInsert } from "@/actions/team";
@@ -85,6 +86,8 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
     setFormData(emptyForm);
   };
 
+  const modalRef = useModalFocus({ isOpen: isModalOpen, onClose: closeModal });
+
   const handleChange = (field: keyof FormData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -150,7 +153,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center bg-[#0A1F33] p-6 rounded-2xl border border-[#14304A]">
+      <div className="flex justify-between items-center bg-surface p-6 rounded-2xl border border-border-input">
         <div>
           <div className="text-xs text-white/50 mb-1 flex items-center gap-2">
             <span>Admin Dashboard</span>
@@ -162,7 +165,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
         </div>
         <button 
           onClick={() => openModal()}
-          className="flex items-center gap-2 bg-[#FFEE34] text-[#00203C] hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
+          className="flex items-center gap-2 bg-yellow text-navy hover:bg-white transition-colors px-6 py-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,238,52,0.3)]"
         >
           <Plus className="w-5 h-5" />
           <span>Add Member</span>
@@ -175,13 +178,13 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
           {members.map(member => (
             <div 
               key={member.id} 
-              className={`bg-[#0A1F33] rounded-2xl p-6 border group relative overflow-hidden transition-all ${
-                member.is_featured ? "border-[#FFEE34]/30 shadow-[0_0_20px_rgba(255,238,52,0.05)] scale-[1.02]" : "border-[#14304A] hover:border-[#FFEE34]/20"
+              className={`bg-surface rounded-2xl p-6 border group relative overflow-hidden transition-all ${
+                member.is_featured ? "border-yellow/30 shadow-[0_0_20px_rgba(255,238,52,0.05)] scale-[1.02]" : "border-border-input hover:border-yellow/20"
               } ${deletingId === member.id ? "opacity-50 pointer-events-none" : ""}`}
             >
               {/* Actions overlay */}
               <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <button onClick={() => openModal(member)} className="w-8 h-8 rounded-full bg-[#14304A] text-white hover:bg-[#FFEE34] hover:text-[#00203C] flex items-center justify-center transition-colors">
+                <button onClick={() => openModal(member)} className="w-8 h-8 rounded-full bg-border-input text-white hover:bg-yellow hover:text-navy flex items-center justify-center transition-colors">
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 {isAdmin && (
@@ -200,26 +203,26 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
 
               <div className="flex flex-col items-center text-center mt-2">
                 <div className="mb-4 relative">
-                  <div className={`w-24 h-24 rounded-full overflow-hidden border-2 ${member.is_featured ? 'border-[#FFEE34] shadow-[0_0_15px_rgba(255,238,52,0.3)]' : 'border-[#14304A]'}`}>
+                  <div className={`w-24 h-24 rounded-full overflow-hidden border-2 ${member.is_featured ? 'border-yellow shadow-[0_0_15px_rgba(255,238,52,0.3)]' : 'border-border-input'}`}>
                     {member.image_url ? (
                       <Image src={member.image_url} alt={member.name_en || member.name_ar} width={96} height={96} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#061520] flex items-center justify-center">
-                        <Camera className="w-8 h-8 text-[#14304A]" />
+                      <div className="w-full h-full bg-surface-deep flex items-center justify-center">
+                        <Camera className="w-8 h-8 text-border-input" />
                       </div>
                     )}
                   </div>
                   {member.is_featured && (
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#0A1F33] flex items-center justify-center">
-                      <Star className="w-5 h-5 text-[#FFEE34] fill-[#FFEE34]" />
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-surface flex items-center justify-center">
+                      <Star className="w-5 h-5 text-yellow fill-[#FFEE34]" />
                     </div>
                   )}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-1">{member.name_ar}</h3>
                 <p className="text-xs font-medium text-white/50 mb-3">{member.name_en}</p>
                 
-                <div className="bg-[#061520] px-4 py-1.5 rounded-full border border-[#14304A]">
-                  <span className="text-sm font-bold text-[#FFEE34]">{member.role_ar}</span>
+                <div className="bg-surface-deep px-4 py-1.5 rounded-full border border-border-input">
+                  <span className="text-sm font-bold text-yellow">{member.role_ar}</span>
                   <span className="text-xs text-white/40 ml-2">/ {member.role_en}</span>
                 </div>
               </div>
@@ -227,13 +230,13 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
           ))}
         </div>
       ) : (
-        <div className="bg-[#0A1F33] rounded-2xl border border-[#14304A] p-16 text-center text-white flex flex-col items-center">
-          <div className="w-16 h-16 bg-[#061520] rounded-full flex items-center justify-center mb-4">
-            <Camera className="w-8 h-8 text-[#14304A]" />
+        <div className="bg-surface rounded-2xl border border-border-input p-16 text-center text-white flex flex-col items-center">
+          <div className="w-16 h-16 bg-surface-deep rounded-full flex items-center justify-center mb-4">
+            <Camera className="w-8 h-8 text-border-input" />
           </div>
           <h3 className="text-xl font-bold mb-2">لا يوجد أعضاء في الفريق</h3>
           <p className="text-sm text-white/50 mb-6">No team members added yet.</p>
-          <button onClick={() => openModal()} className="px-6 py-2 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors">
+          <button onClick={() => openModal()} className="px-6 py-2 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors">
             Add Member
           </button>
         </div>
@@ -241,16 +244,21 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
 
        {/* Modal */}
        <AnimatePresence>
-        {isModalOpen && (
+         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
             
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-[#0A1F33] rounded-2xl overflow-hidden shadow-2xl border-t-4 border-[#FFEE34] flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-[#14304A] bg-[#061520]">
-                <h3 className="text-xl font-bold text-white">
+            <motion.div
+              ref={modalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="team-modal-title"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-surface rounded-2xl overflow-hidden shadow-2xl border-t-4 border-yellow flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-border-input bg-surface-deep">
+                <h3 id="team-modal-title" className="text-xl font-bold text-white">
                   {editingItem?.id ? "Edit Member" : "Add Team Member"}
                 </h3>
-                <button onClick={closeModal} className="text-white/50 hover:text-white transition-colors bg-[#0A1F33] p-1.5 rounded-lg border border-[#14304A]">
+                <button onClick={closeModal} aria-label="Close dialog" className="text-white/50 hover:text-white transition-colors bg-surface p-1.5 rounded-lg border border-border-input">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -263,7 +271,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       type="text" 
                       value={formData.name_en}
                       onChange={(e) => handleChange('name_en', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                   <div className="space-y-1.5 text-right">
@@ -272,7 +280,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       type="text" dir="rtl" 
                       value={formData.name_ar}
                       onChange={(e) => handleChange('name_ar', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                 </div>
@@ -284,7 +292,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       type="text" 
                       value={formData.role_en}
                       onChange={(e) => handleChange('role_en', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                   <div className="space-y-1.5 text-right">
@@ -293,7 +301,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       type="text" dir="rtl" 
                       value={formData.role_ar}
                       onChange={(e) => handleChange('role_ar', e.target.value)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-4 py-2.5 focus:border-[#FFEE34] focus:outline-none" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:border-yellow focus:outline-none" 
                     />
                   </div>
                 </div>
@@ -317,7 +325,7 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       id="featuredM" 
                       checked={formData.is_featured}
                       onChange={(e) => handleChange('is_featured', e.target.checked)}
-                      className="w-5 h-5 accent-[#FFEE34] bg-[#061520] border-[#14304A] rounded" 
+                      className="w-5 h-5 accent-yellow bg-surface-deep border-border-input rounded" 
                     />
                     <label htmlFor="featuredM" className="font-bold text-white text-sm select-none">Mark as Featured Member</label>
                   </div>
@@ -327,18 +335,18 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                       type="number" 
                       value={formData.order_index}
                       onChange={(e) => handleChange('order_index', parseInt(e.target.value) || 0)}
-                      className="w-full bg-[#061520] text-white border border-[#14304A] rounded-lg px-3 py-1.5 focus:border-[#FFEE34] focus:outline-none text-sm" 
+                      className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-3 py-1.5 focus:border-yellow focus:outline-none text-sm" 
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 border-t border-[#14304A] bg-[#061520] flex justify-end gap-3">
+              <div className="p-5 border-t border-border-input bg-surface-deep flex justify-end gap-3">
                 <button onClick={closeModal} disabled={isSaving} className="px-6 py-2.5 text-white/70 hover:text-white font-bold transition-colors disabled:opacity-50">Cancel</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-8 py-2.5 bg-[#FFEE34] text-[#00203C] rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-8 py-2.5 bg-yellow text-navy rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isSaving ? "Saving..." : "Save Changes"}

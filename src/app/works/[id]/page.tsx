@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getWorkById, getNextWork } from "@/lib/supabase/queries";
 import WorkDetailClient from "@/components/works/WorkDetailClient";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour; individual work detail pages
 export const dynamicParams = true;
 
 interface Props {

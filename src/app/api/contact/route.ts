@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // ── Rate limiting ────────────────────────────────────────────────────
     // 3 submissions per IP per 5 minutes — prevents contact form spam.
     const ip = getClientIp(req);
-    const rl = rateLimit(`contact:${ip}`, { limit: 3, windowMs: 5 * 60 * 1_000 });
+    const rl = await rateLimit(`contact:${ip}`, { limit: 3, windowMs: 5 * 60 * 1_000 });
     if (!rl.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please wait before submitting again.' },

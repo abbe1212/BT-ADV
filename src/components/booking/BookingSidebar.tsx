@@ -100,7 +100,7 @@ export default function BookingSidebar({ clients, services, featuredWorks, revie
         <div className="rounded-xl border border-yellow/20 bg-white/5 backdrop-blur-sm p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-yellow text-xs font-bold uppercase tracking-widest">
-              أخر اعمالنا
+              Our Latest Work
             </h3>
             <Link
               href="/works"
@@ -153,11 +153,13 @@ export default function BookingSidebar({ clients, services, featuredWorks, revie
                   {/* Client logo if available */}
                   {work.clients?.logo_url && (
                     <div className="flex items-center gap-1 mt-1">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={work.clients.logo_url}
                         alt={work.clients.name}
-                        className="w-3 h-3 object-contain opacity-60"
+                        width={12}
+                        height={12}
+                        className="object-contain opacity-60"
+                        unoptimized
                       />
                       <span className="text-white/30 text-[9px]">{work.clients.name}</span>
                     </div>
@@ -289,11 +291,13 @@ export default function BookingSidebar({ clients, services, featuredWorks, revie
                   {/* Reviewer */}
                   <div className="flex items-center gap-2 mt-auto pt-1 border-t border-white/5">
                     {review.clients?.logo_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={review.clients.logo_url}
                         alt={review.clients.name}
-                        className="w-4 h-4 object-contain opacity-60 flex-shrink-0"
+                        width={16}
+                        height={16}
+                        className="object-contain opacity-60 flex-shrink-0"
+                        unoptimized
                       />
                     )}
                     <div className="min-w-0">
