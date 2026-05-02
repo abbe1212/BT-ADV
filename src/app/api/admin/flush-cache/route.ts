@@ -33,7 +33,7 @@ export async function POST() {
   ];
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTag(tag, 'default');
   }
 
   // ── Invalidate key public paths ───────────────────────────────────────────
