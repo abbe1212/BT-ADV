@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Bell, LogOut, User, Menu } from "lucide-react";
+import { Search, Bell, LogOut, User, Menu, RefreshCw } from "lucide-react";
 import { useContext } from "react";
 import { SidebarContext } from "@/components/admin/layout/AdminSidebar";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 export function AdminHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string>('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isFlushing, setIsFlushing] = useState(false);
   
   useEffect(() => {
     const getUser = async () => {
@@ -29,6 +31,23 @@ export function AdminHeader() {
     await supabase.auth.signOut();
     router.push('/admin/login');
     router.refresh();
+  };
+
+  const handleFlushCache = async () => {
+    setIsFlushing(true);
+    try {
+      const res = await fetch('/api/admin/flush-cache', { method: 'POST' });
+      if (res.ok) {
+        toast.success('Public site synced — all caches cleared');
+        router.refresh();
+      } else {
+        toast.error('Cache flush failed — please try again');
+      }
+    } catch {
+      toast.error('Network error — could not reach server');
+    } finally {
+      setIsFlushing(false);
+    }
   };
   
   const getPageTitle = () => {
@@ -81,6 +100,17 @@ export function AdminHeader() {
             className="bg-surface-deep text-sm text-white border border-[#0A1F33] rounded-full pl-10 pr-4 py-1.5 w-64 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all placeholder-white/40"
           />
         </div>
+
+        {/* Sync cache button */}
+        <button
+          onClick={handleFlushCache}
+          disabled={isFlushing}
+          title="Sync public site — clears all caches so Supabase edits appear immediately"
+          className="relative flex items-center gap-1.5 text-xs font-bold text-white/60 border border-white/10 hover:border-yellow hover:text-yellow disabled:opacity-50 disabled:cursor-not-allowed transition-all px-3 py-1.5 rounded-lg bg-white/[0.03] hover:bg-yellow/5"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isFlushing ? 'animate-spin' : ''}`} />
+          <span className="hidden md:inline">{isFlushing ? 'Syncing...' : 'Sync'}</span>
+        </button>
 
         {/* Notifications */}
         <button className="relative text-white/70 hover:text-yellow transition-colors">
