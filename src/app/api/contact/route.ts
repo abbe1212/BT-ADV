@@ -22,17 +22,33 @@ export async function POST(req: Request) {
       );
     }
 
-    // ── Rate limiting ────────────────────────────────────────────────────
-    // 3 submissions per IP per 5 minutes — prevents contact form spam.
+    // ── Rate limiting — dual layer ─────────────────────────────────────────
+    // Layer 1: IP-based   — 3 per IP per 5 min   (blocks burst)
+    // Layer 2: Email-based — 5 per email per 24h  (blocks VPN rotation)
     const ip = getClientIp(req);
-    const rl = await rateLimit(`contact:${ip}`, { limit: 3, windowMs: 5 * 60 * 1_000 });
-    if (!rl.success) {
+
+    let emailForRateLimit = 'unknown';
+    try {
+      const clone = req.clone();
+      const peek = await clone.json();
+      if (typeof peek?.email === 'string') emailForRateLimit = peek.email.toLowerCase();
+    } catch { /* ignore */ }
+
+    const [rlIp, rlEmail] = await Promise.all([
+      rateLimit(`contact:ip:${ip}`,                  { limit: 3, windowMs: 5 * 60 * 1_000 }),
+      rateLimit(`contact:email:${emailForRateLimit}`, { limit: 5, windowMs: 24 * 60 * 60 * 1_000 }),
+    ]);
+
+    if (!rlIp.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please wait before submitting again.' },
-        {
-          status: 429,
-          headers: { 'Retry-After': String(rl.retryAfter) },
-        }
+        { status: 429, headers: { 'Retry-After': String(rlIp.retryAfter) } }
+      );
+    }
+    if (!rlEmail.success) {
+      return NextResponse.json(
+        { error: 'You have reached the daily message limit. Please contact us directly.' },
+        { status: 429, headers: { 'Retry-After': String(rlEmail.retryAfter) } }
       );
     }
 

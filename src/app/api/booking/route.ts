@@ -168,17 +168,35 @@ export async function POST(req: Request) {
       );
     }
 
-    // ── Rate limiting ─────────────────────────────────────────────────────────
-    // 5 booking attempts per IP per 10 minutes — prevents slot exhaustion & email abuse.
+    // ── Rate limiting — dual layer ─────────────────────────────────────────
+    // Layer 1: IP-based  — 5 attempts per IP per 10 min   (blocks bots / burst)
+    // Layer 2: Email-based — 3 bookings per email per 24h (blocks VPN rotation)
+    // Both checks run in parallel — zero added latency.
     const ip = getClientIp(req);
-    const rl = await rateLimit(`booking:${ip}`, { limit: 5, windowMs: 10 * 60 * 1_000 });
-    if (!rl.success) {
+
+    // We need the email for layer 2 — peek at body early (clone to avoid consuming)
+    let emailForRateLimit = 'unknown';
+    try {
+      const clone = req.clone();
+      const peek = await clone.json();
+      if (typeof peek?.email === 'string') emailForRateLimit = peek.email.toLowerCase();
+    } catch { /* ignore — email rl is best-effort */ }
+
+    const [rlIp, rlEmail] = await Promise.all([
+      rateLimit(`booking:ip:${ip}`,                  { limit: 5, windowMs: 10 * 60 * 1_000 }),
+      rateLimit(`booking:email:${emailForRateLimit}`, { limit: 3, windowMs: 24 * 60 * 60 * 1_000 }),
+    ]);
+
+    if (!rlIp.success) {
       return NextResponse.json(
-        { error: 'Too many requests. Please wait before submitting again.' },
-        {
-          status: 429,
-          headers: { 'Retry-After': String(rl.retryAfter) },
-        }
+        { error: 'Too many requests from your network. Please wait before submitting again.' },
+        { status: 429, headers: { 'Retry-After': String(rlIp.retryAfter) } }
+      );
+    }
+    if (!rlEmail.success) {
+      return NextResponse.json(
+        { error: 'This email has reached the daily booking limit (3 per day). Contact us directly if you need assistance.' },
+        { status: 429, headers: { 'Retry-After': String(rlEmail.retryAfter) } }
       );
     }
 
@@ -226,12 +244,42 @@ export async function POST(req: Request) {
     };
 
     const supabase = await createClient();
+
+    // ── Pre-check: slot availability (optimistic check before insert) ─────────
+    // Note: this check + insert is NOT atomic — the DB UNIQUE constraint on
+    // (date, time_slot) is the real guard. This pre-check just gives a faster,
+    // friendlier error message before the constraint fires.
+    if (date) {
+      const { data: existing } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('date', date)
+        .eq('time_slot', time_slot)
+        .eq('status', 'confirmed')
+        .maybeSingle();
+
+      if (existing) {
+        return NextResponse.json(
+          { error: 'This slot is already booked. Please choose a different date or time.' },
+          { status: 409 }
+        );
+      }
+    }
+
     const { error: dbError } = await supabase.from('bookings').insert(payload);
 
     if (dbError) {
+      // PostgreSQL unique constraint violation — slot was taken between check and insert
+      if (dbError.code === '23505') {
+        return NextResponse.json(
+          { error: 'This slot was just taken. Please choose a different date or time.' },
+          { status: 409 }
+        );
+      }
       console.error('[POST /api/booking] DB error:', dbError.message);
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
+
 
     // ── 2. Send emails via Resend ─────────────────────────────────────────────
     const RESEND_KEY  = process.env.RESEND_API_KEY;

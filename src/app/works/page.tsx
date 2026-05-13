@@ -35,6 +35,7 @@ export default async function WorksPage() {
           loop
           muted
           playsInline
+          preload="none"
           className="absolute inset-0 w-full h-full object-cover opacity-30"
           src="/Ads images/BT_Website V04 (NFull).mp4"
         />

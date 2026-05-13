@@ -177,7 +177,7 @@ const _getPricing = async (): Promise<Record<string, Pricing[]>> => {
 export const getPricing = unstable_cache(
   _getPricing,
   ['pricing'],
-  { revalidate: 3600, tags: ['pricing'] }
+  { revalidate: 86400, tags: ['pricing'] } // 24h — pricing changes very rarely
 );
 
 // ─── services ─────────────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ const _getServices = async (): Promise<Service[]> => {
 export const getServices = unstable_cache(
   _getServices,
   ['services'],
-  { revalidate: 3600, tags: ['services'] }
+  { revalidate: 86400, tags: ['services'] } // 24h — services list is stable
 );
 
 // ─── bts ──────────────────────────────────────────────────────────────────────
@@ -223,7 +223,7 @@ const _getBts = async (): Promise<BtsItem[]> => {
 export const getBts = unstable_cache(
   _getBts,
   ['bts'],
-  { revalidate: 3600, tags: ['bts'] }
+  { revalidate: 21600, tags: ['bts'] } // 6h — BTS media changes occasionally
 );
 
 // ─── team ─────────────────────────────────────────────────────────────────────
@@ -249,7 +249,7 @@ const _getTeam = async (featuredOnly = false): Promise<TeamMember[]> => {
 export const getTeam = unstable_cache(
   _getTeam,
   ['team'],
-  { revalidate: 3600, tags: ['team'] }
+  { revalidate: 86400, tags: ['team'] } // 24h — team roster changes rarely
 );
 
 // ─── careers ──────────────────────────────────────────────────────────────────
@@ -275,7 +275,7 @@ const _getCareers = async (openOnly = true): Promise<Career[]> => {
 export const getCareers = unstable_cache(
   _getCareers,
   ['careers'],
-  { revalidate: 3600, tags: ['careers'] }
+  { revalidate: 21600, tags: ['careers'] } // 6h — job openings change occasionally
 );
 
 // ─── clients ──────────────────────────────────────────────────────────────────
@@ -298,7 +298,7 @@ const _getClients = async (): Promise<Client[]> => {
 export const getClients = unstable_cache(
   _getClients,
   ['clients'],
-  { revalidate: 3600, tags: ['clients'] }
+  { revalidate: 21600, tags: ['clients'] } // 6h — client list changes occasionally
 );
 
 /**
@@ -383,7 +383,7 @@ const _getFeaturedReviews = async (): Promise<Review[]> => {
 export const getFeaturedReviews = unstable_cache(
   _getFeaturedReviews,
   ['featured-reviews'],
-  { revalidate: 3600, tags: ['reviews'] }
+  { revalidate: 21600, tags: ['reviews'] } // 6h — reviews change occasionally
 );
 
 /**
@@ -439,7 +439,7 @@ const _getSiteSettings = async (): Promise<Record<string, string>> => {
 export const getSiteSettings = unstable_cache(
   _getSiteSettings,
   ['site-settings'],
-  { revalidate: 3600, tags: ['site-settings'] }
+  { revalidate: 86400, tags: ['site-settings'] } // 24h — site settings rarely change
 );
 
 // ─── bookings ─────────────────────────────────────────────────────────────────

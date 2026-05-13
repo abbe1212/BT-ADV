@@ -66,6 +66,7 @@ export default function WorkDetailClient({ work, nextWork }: Props) {
               loop 
               muted 
               playsInline
+              preload="none"
               className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
               src={embedUrl}
             />

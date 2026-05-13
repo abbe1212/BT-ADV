@@ -1,7 +1,9 @@
 import { getClients, getServices, getWorks, getFeaturedReviews } from "@/lib/supabase/queries";
 import BookingPageClient from "@/components/booking/BookingPageClient";
 
-export const dynamic = 'force-dynamic';
+// ISR: revalidate page shell every hour.
+// Live slot availability is fetched client-side via /api/booking/slots — not here.
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Book Your Slot — BT ADV",
