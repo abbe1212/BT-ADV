@@ -61,9 +61,10 @@ function getFreshCsrf(path) {
   // No extra HTTP requests — free if the middleware already set the cookie.
   const defaultJar     = http.cookieJar();
   const defaultCookies = defaultJar.cookiesForURL(origin + '/');
-  const defaultArr     = defaultCookies['csrf-token'];
-  if (defaultArr && defaultArr.length > 0) {
-    return { jar: defaultJar, token: defaultArr[0].value };
+  const defaultArr = defaultCookies['csrf-token'];
+  // k6 cookiesForURL returns arrays of STRINGS (not objects) — use arr[0] directly.
+  if (defaultArr && defaultArr.length > 0 && defaultArr[0]) {
+    return { jar: defaultJar, token: defaultArr[0] };
   }
 
   // ── Strategy 1: GET /api/csrf (returns token in JSON body) ──────────────────
@@ -89,7 +90,7 @@ function getFreshCsrf(path) {
   if (!token) {
     const c   = jar.cookiesForURL(origin + '/');
     const arr = c['csrf-token'];
-    token     = arr && arr.length > 0 ? arr[0].value : '';
+    token     = arr && arr.length > 0 ? arr[0] : '';  // arr[0] is a string
   }
 
   if (!token) console.warn(`[getFreshCsrf] No csrf-token for ${path}.`);
