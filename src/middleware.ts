@@ -14,22 +14,23 @@ export async function middleware(request: NextRequest) {
   });
 
   // ── CSRF cookie ───────────────────────────────────────────────────────────
-  // Set a csrf-token cookie on every GET request that isn't an API call.
-  // Frontend forms read this cookie and attach it as X-CSRF-Token header.
-  // POST/PUT/DELETE API routes then verify header === cookie.
-  const isGetRequest = request.method === 'GET';
-  const isApiRoute   = request.nextUrl.pathname.startsWith('/api');
+  // Set a csrf-token cookie on every non-API GET request so that forms can
+  // read it and echo it as X-CSRF-Token header (double-submit cookie pattern).
+  //
+  // ⚠️  IMPORTANT: The Supabase SSR client's cookie `set`/`remove` callbacks
+  // do `response = NextResponse.next(...)`, which REPLACES the response object
+  // and discards any cookies set on it previously.
+  //
+  // Fix: generate the token NOW (before Supabase runs) and re-apply it to
+  // whatever `response` ends up being AFTER `supabase.auth.getUser()` resolves.
+  const isGetRequest  = request.method === 'GET';
+  const isApiRoute    = request.nextUrl.pathname.startsWith('/api');
   const hasCsrfCookie = request.cookies.has(CSRF_COOKIE);
 
-  if (isGetRequest && !isApiRoute && !hasCsrfCookie) {
-    response.cookies.set(CSRF_COOKIE, generateCsrfToken(), {
-      httpOnly: false,     // must be readable by client JS
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: 60 * 60 * 24, // 24 hours
-    });
-  }
+  // Stash token so we can re-apply it after Supabase may replace `response`.
+  const pendingCsrfToken = isGetRequest && !isApiRoute && !hasCsrfCookie
+    ? generateCsrfToken()
+    : null;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,6 +59,17 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Re-apply CSRF cookie AFTER Supabase (it may have replaced `response` above).
+  if (pendingCsrfToken) {
+    response.cookies.set(CSRF_COOKIE, pendingCsrfToken, {
+      httpOnly: false,     // must be JS-readable (client reads it for form posts)
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+  }
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     // Login page is always accessible.
