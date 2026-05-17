@@ -55,6 +55,7 @@ export async function insertWork(payload: WorkInsert): Promise<MutationResult<Wo
   revalidatePath('/admin/works');
   revalidatePath('/works');
   revalidateTag('works', 'default');
+  revalidateTag('clients', 'default'); // client profile shows linked works
   return { data: data as Work, error: null };
 }
 
@@ -82,6 +83,7 @@ export async function updateWork({ id, ...payload }: WorkUpdate): Promise<Mutati
   revalidatePath('/admin/works');
   revalidatePath('/works');
   revalidateTag('works', 'default');
+  revalidateTag('clients', 'default'); // client profile shows linked works
   return { data: data as Work, error: null };
 }
 
@@ -97,5 +99,6 @@ export async function deleteWork(id: string): Promise<MutationResult> {
   revalidatePath('/admin/works');
   revalidatePath('/works');
   revalidateTag('works', 'default');
+  revalidateTag('clients', 'default'); // client profile shows linked works
   return { data: null, error: null };
 }

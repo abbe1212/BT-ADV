@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, Video, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Video, Loader2, Building2, ChevronDown, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import type { Work } from '@/lib/supabase/types';
+import Image from 'next/image';
+import type { Work, Client } from '@/lib/supabase/types';
 import { insertWork, updateWork, type WorkInsert } from '@/actions/works';
 import { ImageUploadInput } from '@/components/ui/ImageUploadInput';
 
@@ -21,6 +22,7 @@ interface FormData {
   year: number;
   order_index: number;
   featured: boolean;
+  client_id: string;
 }
 
 const EMPTY_FORM: FormData = {
@@ -32,6 +34,7 @@ const EMPTY_FORM: FormData = {
   year: new Date().getFullYear(),
   order_index: 0,
   featured: false,
+  client_id: '',
 };
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
@@ -43,6 +46,137 @@ interface WorkModalProps {
   onClose: () => void;
   /** Called after a successful create or update. */
   onSuccess?: () => void;
+  /** Full list of clients for the picker. */
+  clients?: Client[];
+}
+
+// ─── Client Select Dropdown ────────────────────────────────────────────────────
+
+interface ClientSelectProps {
+  clients: Client[];
+  value: string;
+  onChange: (clientId: string) => void;
+}
+
+function ClientSelect({ clients, value, onChange }: ClientSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selected = clients.find(c => c.id === value) ?? null;
+  const filtered = clients.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className="relative">
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(prev => !prev)}
+        className="w-full bg-surface-deep text-white border border-border-input rounded-lg px-4 py-2.5 focus:outline-none focus:border-yellow focus:ring-1 focus:ring-yellow transition-all flex items-center gap-3 text-left"
+      >
+        {selected ? (
+          <>
+            <span className="w-6 h-6 rounded bg-black/30 flex-shrink-0 flex items-center justify-center overflow-hidden">
+              {selected.logo_url ? (
+                <Image src={selected.logo_url} alt={selected.name} width={24} height={24} className="object-contain" unoptimized />
+              ) : (
+                <Building2 className="w-3.5 h-3.5 text-white/40" />
+              )}
+            </span>
+            <span className="flex-1 truncate font-medium">{selected.name}</span>
+          </>
+        ) : (
+          <>
+            <Building2 className="w-4 h-4 text-white/30 flex-shrink-0" />
+            <span className="text-white/40">No client (unlinked)</span>
+          </>
+        )}
+        <ChevronDown className={`w-4 h-4 text-white/40 ml-auto flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {/* Dropdown */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-full mt-1 left-0 right-0 bg-surface border border-border-input rounded-xl shadow-2xl overflow-hidden"
+          >
+            {/* Search box */}
+            <div className="p-2 border-b border-border-input">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+                <input
+                  autoFocus
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search clients…"
+                  className="w-full bg-surface-deep text-sm text-white border border-border-input rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:border-yellow transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Options list */}
+            <div className="overflow-y-auto max-h-48 py-1">
+              {/* None option */}
+              <button
+                type="button"
+                onClick={() => { onChange(''); setIsOpen(false); setSearch(''); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-white/5 transition-colors ${!value ? 'text-yellow' : 'text-white/50'}`}
+              >
+                <span className="w-6 h-6 rounded bg-white/5 flex-shrink-0 flex items-center justify-center">
+                  <X className="w-3 h-3" />
+                </span>
+                <span className="italic">None (unlinked)</span>
+              </button>
+
+              {filtered.length === 0 ? (
+                <p className="text-center py-3 text-xs text-white/30">No clients match</p>
+              ) : (
+                filtered.map(client => (
+                  <button
+                    key={client.id}
+                    type="button"
+                    onClick={() => { onChange(client.id); setIsOpen(false); setSearch(''); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-white/5 transition-colors ${value === client.id ? 'bg-yellow/5 text-yellow' : 'text-white'}`}
+                  >
+                    <span className="w-6 h-6 rounded bg-black/30 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                      {client.logo_url ? (
+                        <Image src={client.logo_url} alt={client.name} width={24} height={24} className="object-contain" unoptimized />
+                      ) : (
+                        <Building2 className="w-3.5 h-3.5 text-white/40" />
+                      )}
+                    </span>
+                    <span className="flex-1 text-left truncate font-medium">{client.name}</span>
+                    {client.industry && (
+                      <span className="text-[10px] text-white/30 uppercase tracking-wider">{client.industry}</span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -51,7 +185,7 @@ interface WorkModalProps {
  * Self-contained Create / Edit modal for a Work record.
  *
  * Responsibilities:
- * - Owns all form state (title, category, image, video, year, etc.)
+ * - Owns all form state (title, category, image, video, year, client, etc.)
  * - Handles create (insertWork) and update (updateWork) mutations.
  * - Calls `onClose` when cancelled or after a successful save.
  * - Calls `onSuccess` after save so the parent can refresh its list.
@@ -60,7 +194,7 @@ interface WorkModalProps {
  * - Managing `isOpen` — that's the parent's responsibility.
  * - Fetching the work list — the parent handles that.
  */
-export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) {
+export function WorkModal({ work, isOpen, onClose, onSuccess, clients = [] }: WorkModalProps) {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -77,6 +211,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
           year:        work.year,
           order_index: work.order_index,
           featured:    work.featured,
+          client_id:   work.client_id  ?? '',
         });
       } else {
         setFormData(EMPTY_FORM);
@@ -105,6 +240,7 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
       year:        formData.year,
       order_index: formData.order_index,
       featured:    formData.featured,
+      client_id:   formData.client_id   || null,
     };
 
     let error: string | null = null;
@@ -199,6 +335,22 @@ export function WorkModal({ work, isOpen, onClose, onSuccess }: WorkModalProps) 
                   />
                 </div>
               </div>
+
+              {/* Client picker */}
+              {clients.length > 0 && (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-white flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-yellow" />
+                    Client
+                    <span className="text-white/30 font-normal text-xs">(link this work to a client's profile)</span>
+                  </label>
+                  <ClientSelect
+                    clients={clients}
+                    value={formData.client_id}
+                    onChange={id => handleChange('client_id', id)}
+                  />
+                </div>
+              )}
 
               {/* Category + Year */}
               <div className="grid grid-cols-2 gap-5">

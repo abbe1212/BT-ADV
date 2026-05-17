@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Plus, Image as ImageIcon, X, Search } from "lucide-react";
+import { Plus, Image as ImageIcon, X, Search, Building2 } from "lucide-react";
 import Image from "next/image";
-import type { Work } from "@/lib/supabase/types";
+import type { Work, Client } from "@/lib/supabase/types";
 import { deleteWork } from "@/actions/works";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ interface WorksPageProps {
   totalCount?: number;
   currentPage?: number;
   pageSize?: number;
+  clients?: Client[];
 }
 
 /**
@@ -37,7 +38,7 @@ interface WorksPageProps {
  *
  * NOT responsible for form state — that lives in WorkModal.
  */
-export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageSize = 20 }: WorksPageProps) {
+export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageSize = 20, clients = [] }: WorksPageProps) {
   const [works, setWorks] = useState(initialWorks);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWork, setEditingWork] = useState<Work | null>(null);
@@ -170,6 +171,7 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
                 isDeletingThisCard={deletingId === work.id}
                 onEdit={openEdit}
                 onDelete={handleDelete}
+                clientMap={Object.fromEntries(clients.map(c => [c.id, c]))}
               />
             ))}
           </div>
@@ -203,6 +205,7 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
         isOpen={isModalOpen}
         onClose={closeModal}
         onSuccess={() => router.refresh()}
+        clients={clients}
       />
     </div>
   );
@@ -210,14 +213,17 @@ export function WorksPage({ initialWorks, totalCount = 0, currentPage = 1, pageS
 
 // ─── WorkCard (private sub-component) ──────────────────────────────────────────
 
+
 interface WorkCardProps {
   work: Work;
   isDeletingThisCard: boolean;
   onEdit: (work: Work) => void;
   onDelete: (work: Work) => void;
+  clientMap?: Record<string, Client>;
 }
 
-function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps) {
+function WorkCard({ work, isDeletingThisCard, onEdit, onDelete, clientMap = {} }: WorkCardProps) {
+  const linkedClient = work.client_id ? clientMap[work.client_id] : null;
   return (
     <div
       className={`bg-surface rounded-xl border border-border-input overflow-hidden group ${
@@ -277,6 +283,18 @@ function WorkCard({ work, isDeletingThisCard, onEdit, onDelete }: WorkCardProps)
         </div>
         <h3 className="text-lg font-bold text-white leading-tight mb-1">{work.title_ar}</h3>
         <p className="text-sm text-white/60">{work.title_en}</p>
+        {linkedClient && (
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border-input">
+            <span className="w-5 h-5 rounded bg-black/30 flex-shrink-0 flex items-center justify-center overflow-hidden">
+              {linkedClient.logo_url ? (
+                <Image src={linkedClient.logo_url} alt={linkedClient.name} width={20} height={20} className="object-contain" unoptimized />
+              ) : (
+                <Building2 className="w-3 h-3 text-white/30" />
+              )}
+            </span>
+            <span className="text-xs text-white/50 truncate">{linkedClient.name}</span>
+          </div>
+        )}
       </div>
     </div>
   );
