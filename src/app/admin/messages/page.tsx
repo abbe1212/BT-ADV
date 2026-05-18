@@ -5,6 +5,7 @@ import { getAllMessages } from "@/lib/supabase/queries";
 export const dynamic = 'force-dynamic';
 
 export default async function MessagesRoute() {
-  const messages = await getAllMessages();
-  return <MessagesPage initialMessages={messages} />;
+  // [P1.11] getAllMessages now returns { data, count } with default limit of 50.
+  const { data: messages, count } = await getAllMessages({ limit: 50 });
+  return <MessagesPage initialMessages={messages} totalCount={count} />;
 }

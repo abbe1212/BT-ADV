@@ -1,26 +1,24 @@
 'use client';
 
 /**
- * MediaUploader — Cloudinary-backed drag-and-drop uploader
+ * MediaUploader — Unified drag-and-drop media uploader
  * ─────────────────────────────────────────────────────────────────────────────
- * Flow:
- *  1. User selects / drops a file
- *  2. Client-side validation (type + size)
- *  3. POST multipart/form-data to /api/upload
- *  4. API streams to Cloudinary → returns { url }
- *  5. onUpload(url) is called → caller stores the URL wherever needed
+ * Routes uploads to the correct API endpoint based on `uploadMode`:
  *
- * Per-entity folder convention:
- *   bt-agency/works    bt-agency/clients   bt-agency/team
- *   bt-agency/bts      bt-agency/reviews   bt-agency/settings
+ *   uploadMode="image"  → POST /api/upload/image  → Supabase (JPG compressed)
+ *                         Requires: assetType + slug props
  *
- * Usage:
- *   <MediaUploader
- *     accept="image"
- *     folder="bt-agency/clients"
- *     onUpload={(url) => setValue('logo_url', url)}
- *     onRemove={() => setValue('logo_url', '')}
- *   />
+ *   uploadMode="logo"   → POST /api/upload/logo   → Cloudinary (WebP compressed)
+ *                         Requires: slug prop (client slug)
+ *
+ *   uploadMode="video"  → POST /api/upload/video  → Supabase (stored as-is)
+ *                         Optional: slug prop
+ *
+ *   uploadMode="legacy" → POST /api/upload         → Cloudinary (old generic route)
+ *                         Requires: folder prop
+ *                         Default for backward compatibility.
+ *
+ * All modes call onUpload(url) with a publicly accessible URL on success.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -31,46 +29,64 @@ import Image from 'next/image';
 /* ─── Types ──────────────────────────────────────────────────────────────────*/
 
 export type MediaAccept = 'image' | 'video' | 'both';
+export type UploadMode  = 'image' | 'logo' | 'video' | 'legacy';
 
 export interface MediaUploaderProps {
-  /** Called with the Cloudinary secure URL when upload succeeds */
+  /** Called with the public URL when upload succeeds */
   onUpload: (url: string) => void;
-  /** Restrict allowed media type. Default: 'both' */
-  accept?: MediaAccept;
+
   /**
-   * Cloudinary subfolder — use per-entity paths.
-   * Examples: 'bt-agency/works', 'bt-agency/clients', 'bt-agency/team', 'bt-agency/bts'
-   * Default: 'bt-agency'
+   * Which upload pipeline to use.
+   * Default: 'legacy' (backwards-compatible Cloudinary generic route)
    */
+  uploadMode?: UploadMode;
+
+  /**
+   * For uploadMode="image": 'team' | 'bts_image'
+   * Required when uploadMode is 'image'.
+   */
+  assetType?: 'team' | 'bts_image';
+
+  /**
+   * For uploadMode="image" | "logo" | "video":
+   * URL-safe slug used as the filename base.
+   * - image/team: team member name slug  (e.g. "ahmed-khalil")
+   * - image/bts:  project slug           (e.g. "dubai-shoot")
+   * - logo:       client slug            (e.g. "pepsico")
+   * - video:      project slug           (optional, auto-derived from filename)
+   */
+  slug?: string;
+
+  /** Legacy mode: Cloudinary subfolder. Only used when uploadMode="legacy". */
   folder?: string;
+
+  /** Restrict accepted file types. Default: 'both' */
+  accept?: MediaAccept;
+
   /** Pre-existing URL to show as the initial preview */
   defaultUrl?: string;
-  /** Label shown inside the drop zone (overrides the default) */
+
+  /** Label shown inside the drop zone */
   label?: string;
-  /** Show a remove / clear button when a file is uploaded. Default: true */
+
+  /** Show a remove / clear button. Default: true */
   allowRemove?: boolean;
+
   /** Called when the user clears the current upload */
   onRemove?: () => void;
+
   /** Extra className applied to the root element */
   className?: string;
+
   /** Disable all interactions */
   disabled?: boolean;
-}
-
-interface UploadResponse {
-  url: string;
-  publicId: string;
-  resourceType: string;
-  bytes: number;
-  width?: number;
-  height?: number;
 }
 
 /* ─── Validation constants ───────────────────────────────────────────────────*/
 
 const ALLOWED_IMAGE_TYPES = new Set([
   'image/jpeg', 'image/jpg', 'image/png',
-  'image/webp', 'image/gif', 'image/avif',
+  'image/webp', 'image/avif', 'image/heic', 'image/heif', 'image/bmp', 'image/tiff',
 ]);
 
 const ALLOWED_VIDEO_TYPES = new Set([
@@ -78,54 +94,95 @@ const ALLOWED_VIDEO_TYPES = new Set([
   'video/quicktime', 'video/x-msvideo',
 ]);
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;  // 10 MB
-const MAX_VIDEO_BYTES = 50 * 1024 * 1024;  // 50 MB
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024;   // 15 MB (Sharp will compress down)
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024;  // 100 MB
 
 const ACCEPT_ATTR: Record<MediaAccept, string> = {
-  image: 'image/jpeg,image/jpg,image/png,image/webp,image/gif,image/avif',
+  image: 'image/jpeg,image/jpg,image/png,image/webp,image/avif,image/heic,image/heif,image/bmp,image/tiff',
   video: 'video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo',
-  both:  'image/jpeg,image/jpg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo',
+  both:  'image/jpeg,image/jpg,image/png,image/webp,image/avif,image/heic,image/heif,image/bmp,image/tiff,video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo',
 };
 
 const HINT_TEXT: Record<MediaAccept, string> = {
-  image: 'Images · JPEG PNG WebP GIF AVIF · max 10 MB',
-  video: 'Videos · MP4 WebM OGG MOV · max 50 MB',
-  both:  'Images up to 10 MB · Videos up to 50 MB',
+  image: 'JPEG · PNG · WebP · AVIF · HEIC · max 15 MB',
+  video: 'MP4 · WebM · MOV · max 100 MB',
+  both:  'Images up to 15 MB · Videos up to 100 MB',
 };
 
-/* ─── Client-side file validator ─────────────────────────────────────────────*/
+/* ─── Validator ──────────────────────────────────────────────────────────────*/
 
 function validateFile(file: File, accept: MediaAccept): string | null {
   const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
   const isVideo = ALLOWED_VIDEO_TYPES.has(file.type);
 
   if (accept === 'image' && !isImage)
-    return `Only image files are allowed (JPEG, PNG, WebP, GIF, AVIF). Got: ${file.type}`;
+    return `Only image files are allowed. Got: ${file.type}`;
   if (accept === 'video' && !isVideo)
-    return `Only video files are allowed (MP4, WebM, OGG, MOV). Got: ${file.type}`;
+    return `Only video files are allowed. Got: ${file.type}`;
   if (accept === 'both' && !isImage && !isVideo)
     return `Unsupported file type: ${file.type}`;
 
   const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
   if (file.size > maxBytes) {
-    const maxMb = maxBytes / 1024 / 1024;
+    const maxMb  = maxBytes / 1024 / 1024;
     const sizeMb = (file.size / 1024 / 1024).toFixed(1);
-    return `File is too large (${sizeMb} MB). Maximum allowed: ${maxMb} MB`;
+    return `File is too large (${sizeMb} MB). Maximum: ${maxMb} MB`;
   }
 
-  return null; // valid
+  return null;
 }
 
 function isVideoUrl(url: string): boolean {
   return /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url);
 }
 
+/* ─── Build FormData for each upload mode ────────────────────────────────────*/
+
+function buildEndpoint(mode: UploadMode): string {
+  switch (mode) {
+    case 'image':  return '/api/upload/image';
+    case 'logo':   return '/api/upload/logo';
+    case 'video':  return '/api/upload/video';
+    case 'legacy': return '/api/upload';
+  }
+}
+
+function buildFormData(
+  file: File,
+  mode: UploadMode,
+  opts: { assetType?: string; slug?: string; folder?: string }
+): FormData {
+  const fd = new FormData();
+  fd.append('file', file);
+
+  switch (mode) {
+    case 'image':
+      fd.append('asset_type', opts.assetType ?? 'bts_image');
+      fd.append('slug', opts.slug ?? file.name.replace(/\.[^.]+$/, ''));
+      break;
+    case 'logo':
+      fd.append('client_slug', opts.slug ?? 'client');
+      break;
+    case 'video':
+      if (opts.slug) fd.append('slug', opts.slug);
+      break;
+    case 'legacy':
+      fd.append('folder', opts.folder ?? 'bt-agency');
+      break;
+  }
+
+  return fd;
+}
+
 /* ─── Component ──────────────────────────────────────────────────────────────*/
 
 export default function MediaUploader({
   onUpload,
-  accept = 'both',
+  uploadMode = 'legacy',
+  assetType,
+  slug,
   folder = 'bt-agency',
+  accept = 'both',
   defaultUrl,
   label,
   allowRemove = true,
@@ -143,10 +200,12 @@ export default function MediaUploader({
   const uploadFile = useCallback(async (file: File) => {
     if (disabled) return;
 
-    // ── Client-side validation (fast, no network) ──────────────────────────
     const validationError = validateFile(file, accept);
-    if (validationError) {
-      toast.error(validationError);
+    if (validationError) { toast.error(validationError); return; }
+
+    // Validate required props for new modes
+    if (uploadMode === 'image' && !assetType) {
+      toast.error('Developer error: assetType is required for uploadMode="image"');
       return;
     }
 
@@ -154,18 +213,14 @@ export default function MediaUploader({
     setProgress(10);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', folder);
+      const fd = buildFormData(file, uploadMode, { assetType, slug, folder });
 
-      // Animate progress bar while waiting for server
-      const tick = setInterval(() => {
-        setProgress((p) => Math.min(p + 7, 85));
-      }, 300);
+      // Animate progress bar
+      const tick = setInterval(() => setProgress(p => Math.min(p + 7, 85)), 300);
 
-      const res = await fetch('/api/upload', {
+      const res = await fetch(buildEndpoint(uploadMode), {
         method: 'POST',
-        body: formData,
+        body: fd,
       });
 
       clearInterval(tick);
@@ -176,12 +231,13 @@ export default function MediaUploader({
         throw new Error(body?.error ?? `Server error (${res.status})`);
       }
 
-      const data: UploadResponse = await res.json();
+      const data = await res.json() as { url: string };
       setPreviewUrl(data.url);
       setProgress(100);
       onUpload(data.url);
       toast.success('Uploaded successfully!');
       setTimeout(() => setProgress(0), 600);
+
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Upload failed');
       setProgress(0);
@@ -189,10 +245,10 @@ export default function MediaUploader({
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  }, [accept, disabled, folder, onUpload]);
+  }, [accept, assetType, disabled, folder, onUpload, slug, uploadMode]);
 
   /* ── Drag handlers ─────────────────────────────────────────────────────────*/
-  const onDragOver = useCallback((e: React.DragEvent) => {
+  const onDragOver  = useCallback((e: React.DragEvent) => {
     e.preventDefault(); e.stopPropagation();
     if (!disabled) setIsDragOver(true);
   }, [disabled]);
@@ -232,11 +288,11 @@ export default function MediaUploader({
   return (
     <div className={`mu-root ${className}`} style={S.root}>
 
-      {/* ── Drop Zone ────────────────────────────────────────────────────*/}
+      {/* ── Drop Zone ──────────────────────────────────────────────────────*/}
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}
-        aria-label={label ?? `Upload ${accept === 'image' ? 'image' : accept === 'video' ? 'video' : 'image or video'}`}
+        aria-label={label ?? `Upload ${accept === 'image' ? 'image' : accept === 'video' ? 'video' : 'media'}`}
         onClick={openPicker}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openPicker()}
         onDragOver={onDragOver}
@@ -244,14 +300,13 @@ export default function MediaUploader({
         onDrop={onDrop}
         style={{
           ...S.zone,
-          ...(isDragOver   ? S.zoneActive   : {}),
-          ...(hasPreview   ? S.zonePreview  : {}),
-          cursor:  disabled ? 'not-allowed' : uploading ? 'wait' : 'pointer',
-          opacity: disabled ? 0.5 : 1,
+          ...(isDragOver  ? S.zoneActive  : {}),
+          ...(hasPreview  ? S.zonePreview : {}),
+          cursor:  disabled  ? 'not-allowed' : uploading ? 'wait' : 'pointer',
+          opacity: disabled  ? 0.5 : 1,
         }}
       >
         {hasPreview ? (
-          /* ── Preview ────────────────────────────────────────────────*/
           <div className="mu-preview-wrap" style={S.previewWrap}>
             {isVideo ? (
               <video src={previewUrl} controls style={S.media} onClick={(e) => e.stopPropagation()} />
@@ -264,36 +319,42 @@ export default function MediaUploader({
             </div>
           </div>
         ) : (
-          /* ── Empty state ────────────────────────────────────────────*/
           <div style={S.empty}>
             <UploadSVG color={isDragOver ? '#FFEE34' : 'rgba(255,255,255,0.3)'} size={38} />
-            <p style={S.emptyTitle}>{label ?? `Drop ${accept === 'image' ? 'an image' : accept === 'video' ? 'a video' : 'an image or video'} here`}</p>
+            <p style={S.emptyTitle}>
+              {label ?? `Drop ${accept === 'image' ? 'an image' : accept === 'video' ? 'a video' : 'a file'} here`}
+            </p>
             <p style={S.emptyOr}>or <span style={S.emptyBrowse}>browse files</span></p>
             <p style={S.emptyHint}>{HINT_TEXT[accept]}</p>
+            {uploadMode !== 'legacy' && (
+              <p style={S.emptyPipeline}>
+                {uploadMode === 'logo' ? '☁ Cloudinary CDN' : '🗄 Supabase Storage'} · compressed automatically
+              </p>
+            )}
           </div>
         )}
       </div>
 
-      {/* ── Progress bar ─────────────────────────────────────────────────*/}
+      {/* ── Progress bar ───────────────────────────────────────────────────*/}
       {uploading && (
         <div style={S.progressRow}>
           <div style={S.progressTrack}>
             <div style={{ ...S.progressFill, width: `${progress}%` }} />
           </div>
           <span style={S.progressLabel}>
-            {progress < 95 ? 'Uploading…' : 'Processing…'}
+            {progress < 50 ? 'Compressing…' : progress < 95 ? 'Uploading…' : 'Saving…'}
           </span>
         </div>
       )}
 
-      {/* ── Remove button ─────────────────────────────────────────────────*/}
+      {/* ── Remove button ──────────────────────────────────────────────────*/}
       {hasPreview && allowRemove && !uploading && (
         <button type="button" onClick={handleRemove} style={S.removeBtn} aria-label="Remove media">
           <TrashSVG /> Remove
         </button>
       )}
 
-      {/* ── Hidden file input ─────────────────────────────────────────────*/}
+      {/* ── Hidden file input ───────────────────────────────────────────────*/}
       <input
         ref={fileInputRef}
         type="file"
@@ -307,7 +368,7 @@ export default function MediaUploader({
   );
 }
 
-/* ─── Tiny SVG icons ─────────────────────────────────────────────────────────*/
+/* ─── SVG icons ──────────────────────────────────────────────────────────────*/
 
 function UploadSVG({ color, size }: { color: string; size: number }) {
   return (
@@ -337,7 +398,7 @@ function TrashSVG() {
 /* ─── Styles ─────────────────────────────────────────────────────────────────*/
 
 const S: Record<string, React.CSSProperties> = {
-  root: { display: 'flex', flexDirection: 'column', gap: 8, width: '100%' },
+  root:         { display: 'flex', flexDirection: 'column', gap: 8, width: '100%' },
   zone: {
     position: 'relative', display: 'flex', alignItems: 'center',
     justifyContent: 'center', borderRadius: 12, overflow: 'hidden',
@@ -345,15 +406,16 @@ const S: Record<string, React.CSSProperties> = {
     background: 'rgba(255,255,255,0.025)',
     transition: 'border-color .2s, background .2s', minHeight: 170,
   },
-  zoneActive: { borderColor: '#FFEE34', background: 'rgba(255,238,52,0.05)' },
-  zonePreview: { border: '2px solid rgba(255,255,255,0.09)', minHeight: 0 },
-  empty: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 20px', textAlign: 'center' },
-  emptyTitle: { margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.65)' },
-  emptyOr: { margin: '0 0 6px', fontSize: 12, color: 'rgba(255,255,255,0.35)' },
-  emptyBrowse: { color: '#FFEE34', fontWeight: 700, textDecoration: 'underline' },
-  emptyHint: { margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.22)' },
-  previewWrap: { position: 'relative', width: '100%' },
-  media: { width: '100%', display: 'block', maxHeight: 340, objectFit: 'cover', borderRadius: 10 },
+  zoneActive:   { borderColor: '#FFEE34', background: 'rgba(255,238,52,0.05)' },
+  zonePreview:  { border: '2px solid rgba(255,255,255,0.09)', minHeight: 0 },
+  empty:        { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 20px', textAlign: 'center' },
+  emptyTitle:   { margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.65)' },
+  emptyOr:      { margin: '0 0 6px', fontSize: 12, color: 'rgba(255,255,255,0.35)' },
+  emptyBrowse:  { color: '#FFEE34', fontWeight: 700, textDecoration: 'underline' },
+  emptyHint:    { margin: '0 0 4px', fontSize: 11, color: 'rgba(255,255,255,0.22)' },
+  emptyPipeline:{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.18)', fontStyle: 'italic' },
+  previewWrap:  { position: 'relative', width: '100%' },
+  media:        { width: '100%', display: 'block', maxHeight: 340, objectFit: 'cover', borderRadius: 10 },
   overlay: {
     position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)',
     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -361,10 +423,10 @@ const S: Record<string, React.CSSProperties> = {
     transition: 'opacity .2s',
   },
   overlayLabel: { color: '#fff', fontSize: 12, fontWeight: 600, letterSpacing: '.4px' },
-  progressRow: { display: 'flex', alignItems: 'center', gap: 10 },
-  progressTrack: { flex: 1, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
+  progressRow:  { display: 'flex', alignItems: 'center', gap: 10 },
+  progressTrack:{ flex: 1, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
   progressFill: { height: '100%', background: 'linear-gradient(90deg,#FFEE34,#ffe97a)', borderRadius: 99, transition: 'width .3s ease' },
-  progressLabel: { fontSize: 11, color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' },
+  progressLabel:{ fontSize: 11, color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' },
   removeBtn: {
     display: 'inline-flex', alignItems: 'center', alignSelf: 'flex-start',
     background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.28)',
@@ -373,7 +435,7 @@ const S: Record<string, React.CSSProperties> = {
   },
 };
 
-/* ─── Hover CSS injection (overlay + remove button) ─────────────────────────*/
+/* ─── Hover CSS injection ────────────────────────────────────────────────────*/
 if (typeof window !== 'undefined') {
   const id = 'mu-hover-styles';
   if (!document.getElementById(id)) {

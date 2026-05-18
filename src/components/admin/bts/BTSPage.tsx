@@ -319,11 +319,17 @@ export function BTSPage({ initialBts }: BTSPageProps) {
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-white">Media File *</label>
                   <MediaUploader
-                    accept="both"
-                    folder="bt-agency/bts"
+                    accept={formData.media_type === 'video' ? 'video' : 'image'}
+                    uploadMode={formData.media_type === 'video' ? 'video' : 'image'}
+                    assetType={formData.media_type === 'video' ? undefined : 'bts_image'}
+                    slug={
+                      (formData.title_en || formData.title_ar || 'bts')
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-|-$/g, '')
+                    }
                     defaultUrl={formData.media_url}
                     onUpload={(url) => {
-                      // Auto-detect type from the Cloudinary URL extension
                       const isVideo = /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url);
                       setFormData(prev => ({
                         ...prev,
@@ -332,7 +338,10 @@ export function BTSPage({ initialBts }: BTSPageProps) {
                       }));
                     }}
                     onRemove={() => setFormData(prev => ({ ...prev, media_url: '' }))}
-                    label="Drop image or video here"
+                    label={formData.media_type === 'video'
+                      ? 'Drop BTS video here · stored in Supabase'
+                      : 'Drop BTS image here · auto-compressed to JPG'
+                    }
                   />
                 </div>
 

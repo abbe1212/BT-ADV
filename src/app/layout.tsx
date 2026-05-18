@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Cairo, Bebas_Neue } from "next/font/google";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import "./globals.css";
 
 const inter = Inter({
@@ -66,6 +68,10 @@ export default function RootLayout({
             </span>
           </a>
         </LanguageProvider>
+        {/* [P1.12] Vercel Analytics — tracks page views and Web Vitals (activates on Vercel) */}
+        <Analytics />
+        {/* [P1.12] Speed Insights — sends Core Web Vitals from real users to Vercel dashboard */}
+        <SpeedInsights />
       </body>
     </html>
   );

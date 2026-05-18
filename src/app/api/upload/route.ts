@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { verifyCsrfToken } from '@/lib/csrf';
+import { requireAdmin } from '@/lib/supabase/admin-auth';
 
 /* ─── Config ─────────────────────────────────────────────────────────────────*/
 
@@ -35,13 +37,23 @@ const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
  * Returns:
  *   { url: string, publicId: string, resourceType: string, bytes: number }
  *
- * The caller is responsible for persisting the returned `url` to Supabase
- * via the appropriate Server Action (e.g. works.ts, clients.ts, bts.ts).
- *
+ * Security: requires authenticated admin session + valid CSRF token.
  * Rate limit: 20 uploads per IP per 10 minutes.
  */
 export async function POST(req: Request) {
   try {
+    /* ── [P0.1] CSRF verification ────────────────────────────────────────────*/
+    if (!verifyCsrfToken(req)) {
+      return NextResponse.json(
+        { error: 'Invalid or missing CSRF token.' },
+        { status: 403 }
+      );
+    }
+
+    /* ── [P0.1] Admin authentication ─────────────────────────────────────────*/
+    const guard = await requireAdmin();
+    if (guard.error) return guard.error;
+
     /* ── Rate limiting ──────────────────────────────────────────────────────*/
     const ip = getClientIp(req);
     const rl = await rateLimit(`upload:${ip}`, { limit: 20, windowMs: 10 * 60 * 1_000 });
@@ -99,11 +111,10 @@ export async function POST(req: Request) {
 
     const result = await uploadToCloudinary(buffer, {
       folder,
-      resourceType: 'auto', // Cloudinary detects image vs video automatically
+      resourceType: 'auto',
     });
 
     /* ── Return Cloudinary URL to caller ────────────────────────────────────*/
-    // The caller (Server Action or client) persists the URL wherever needed.
     return NextResponse.json({
       url:          result.secureUrl,
       publicId:     result.publicId,
@@ -127,4 +138,3 @@ export async function POST(req: Request) {
 /* ─── Route Segment Config (App Router) ─────────────────────────────────────*/
 // Allow up to 60 s for large video uploads (Vercel hobby plan max is 60 s).
 export const maxDuration = 60;
-

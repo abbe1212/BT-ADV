@@ -3,7 +3,7 @@ import { createAnonClient } from './anon-client';
 import { unstable_cache } from 'next/cache';
 import type {
   Work, Pricing, Service, BtsItem, TeamMember,
-  Career, ClientLogo, SiteSetting, BookingInsert, ContactMessageInsert,
+  Career, SiteSetting, BookingInsert, ContactMessageInsert,
   Booking, ContactMessage, Client, Review
 } from './types';
 
@@ -88,7 +88,7 @@ export const getWorkById = unstable_cache(
     if (error) { console.error('[getWorkById]', error.message); return null; }
     return data as Work;
   },
-  ['work-by-id'],
+  ['work-by-id', 'id'], // [P0.4] key includes param — each id gets its own cache entry
   { revalidate: 3600, tags: ['works'] }
 );
 
@@ -125,7 +125,7 @@ export const getNextWork = unstable_cache(
 
     return (nextResult.data ?? firstResult.data) as Work | null;
   },
-  ['next-work'],
+  ['next-work', 'currentOrderIndex'], // [P0.4] key includes param
   { revalidate: 300, tags: ['works'] } // 5 min — shorter for navigation freshness
 );
 
@@ -317,7 +317,7 @@ export const getClientBySlug = unstable_cache(
     if (error) { console.error('[getClientBySlug]', error.message); return null; }
     return data as Client;
   },
-  ['client-by-slug'],
+  ['client-by-slug', 'slug'], // [P0.4] key includes param
   { revalidate: 3600, tags: ['clients'] }
 );
 
@@ -347,21 +347,49 @@ export const getClientWithRelations = unstable_cache(
       reviews: reviews || [],
     };
   },
-  ['client-with-relations'],
+  ['client-with-relations', 'slug'], // [P0.4] key includes param
   { revalidate: 3600, tags: ['clients', 'works', 'reviews'] }
 );
 
 // ─── reviews ──────────────────────────────────────────────────────────────────
 
-export async function getAllReviews(): Promise<Review[]> {
+export interface GetReviewsFilters {
+  limit?: number;
+  offset?: number;
+  clientId?: string;
+  isFeatured?: boolean;
+}
+
+/**
+ * Paginated reviews query for the admin dashboard.
+ * [P2.19] Previously fetched all rows; now supports limit/offset + filters.
+ * Default: 50 rows, newest first.
+ */
+export async function getAllReviews(
+  filters?: GetReviewsFilters
+): Promise<{ data: Review[]; count: number }> {
   const supabase = createAnonClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from('reviews')
-    .select('*, clients(*)')
+    .select('*, clients(*)', { count: 'exact' })
     .order('created_at', { ascending: false });
 
-  if (error) { console.error('[getAllReviews]', error.message); return []; }
-  return data as Review[];
+  if (filters?.clientId) {
+    query = query.eq('client_id', filters.clientId);
+  }
+
+  if (filters?.isFeatured !== undefined) {
+    query = query.eq('is_featured', filters.isFeatured);
+  }
+
+  const limit  = filters?.limit  ?? 50;
+  const offset = filters?.offset ?? 0;
+  query = query.range(offset, offset + limit - 1);
+
+  const { data, error, count } = await query;
+
+  if (error) { console.error('[getAllReviews]', error.message); return { data: [], count: 0 }; }
+  return { data: data as Review[], count: count ?? 0 };
 }
 
 const _getFeaturedReviews = async (): Promise<Review[]> => {
@@ -402,22 +430,9 @@ export const getReviewsByClient = unstable_cache(
     if (error) { console.error('[getReviewsByClient]', error.message); return []; }
     return data as Review[];
   },
-  ['reviews-by-client'],
+  ['reviews-by-client', 'clientId'], // [P0.4] key includes param
   { revalidate: 3600, tags: ['reviews'] }
 );
-
-// ─── client_logos (deprecated) ────────────────────────────────────────────────
-
-export async function getClientLogos(): Promise<ClientLogo[]> {
-  const supabase = createAnonClient();
-  const { data, error } = await supabase
-    .from('client_logos')
-    .select('*')
-    .order('order_index', { ascending: true });
-
-  if (error) { console.error('[getClientLogos]', error.message); return []; }
-  return data as ClientLogo[];
-}
 
 // ─── site_settings ────────────────────────────────────────────────────────────
 
@@ -462,7 +477,7 @@ export const getBookedSlots = unstable_cache(
     if (error) { console.error('[getBookedSlots]', error.message); return []; }
     return (data as { time_slot: string }[]).map((r) => r.time_slot);
   },
-  ['booked-slots'],
+  ['booked-slots', 'date'], // [P0.4] key includes param — each date gets its own slot cache
   { revalidate: 60, tags: ['booked-slots'] }
 );
 
@@ -638,15 +653,45 @@ export async function getBookingById(id: string): Promise<Booking | null> {
 
 // ─── admin: all messages ──────────────────────────────────────────────────────
 
-export async function getAllMessages(): Promise<ContactMessage[]> {
+export interface GetMessagesFilters {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  isRead?: boolean;
+}
+
+/**
+ * Paginated messages query for the admin dashboard.
+ * [P1.11] Previously fetched all rows; now supports limit/offset + search.
+ * Default: 50 rows, newest first.
+ */
+export async function getAllMessages(
+  filters?: GetMessagesFilters
+): Promise<{ data: ContactMessage[]; count: number }> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from('contact_messages')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
 
-  if (error) { console.error('[getAllMessages]', error.message); return []; }
-  return data as ContactMessage[];
+  if (filters?.isRead !== undefined) {
+    query = query.eq('is_read', filters.isRead);
+  }
+
+  if (filters?.search) {
+    query = query.or(
+      `name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,message.ilike.%${filters.search}%`
+    );
+  }
+
+  const limit  = filters?.limit  ?? 50;
+  const offset = filters?.offset ?? 0;
+  query = query.range(offset, offset + limit - 1);
+
+  const { data, error, count } = await query;
+
+  if (error) { console.error('[getAllMessages]', error.message); return { data: [], count: 0 }; }
+  return { data: data as ContactMessage[], count: count ?? 0 };
 }
 
 // ─── admin: all pricing (flat list) ───────────────────────────────────────────

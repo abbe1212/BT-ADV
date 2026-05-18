@@ -310,11 +310,18 @@ export function TeamPage({ initialMembers }: TeamPageProps) {
                   <label className="text-sm font-bold text-white">Photo</label>
                   <MediaUploader
                     accept="image"
-                    folder="bt-agency/team"
+                    uploadMode="image"
+                    assetType="team"
+                    slug={
+                      (formData.name_en || formData.name_ar || 'team-member')
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-|-$/g, '')
+                    }
                     defaultUrl={formData.image_url}
                     onUpload={(url) => handleChange('image_url', url)}
                     onRemove={() => handleChange('image_url', '')}
-                    label="Drop member photo here"
+                    label="Drop member photo here · auto-compressed to JPG"
                   />
                 </div>
 

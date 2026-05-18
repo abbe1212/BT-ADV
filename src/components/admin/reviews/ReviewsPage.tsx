@@ -15,9 +15,11 @@ import { useConfirm } from "@/providers/ConfirmProvider";
 interface ReviewsPageProps {
   initialReviews: Review[];
   clients: Client[];
+  /** Total row count from DB — may exceed initialReviews.length when paginated. */
+  totalCount?: number;
 }
 
-export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
+export function ReviewsPage({ initialReviews, clients, totalCount }: ReviewsPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Review | null>(null);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
@@ -198,6 +200,9 @@ export function ReviewsPage({ initialReviews, clients }: ReviewsPageProps) {
           </div>
           <h2 className="text-2xl font-bold text-white mb-1">Manage Reviews</h2>
           <p className="text-sm text-white/50">إدارة آراء العملاء والتقييمات</p>
+          {totalCount !== undefined && totalCount > reviews.length && (
+            <p className="text-xs text-white/40 mt-1">Showing {reviews.length} of {totalCount} reviews</p>
+          )}
         </div>
         <button 
           onClick={openAddModal}

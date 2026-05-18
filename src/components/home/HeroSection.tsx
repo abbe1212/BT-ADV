@@ -128,20 +128,10 @@ export default function HeroSection({ logos = [] }: Props) {
                          subtitle always pinned bottom-right at scale-[0.6].
           sm+         : original centre → corner on hover behaviour.
         */}
-        <div className="group absolute inset-0 flex flex-col items-center justify-center overflow-hidden p-4 md:p-8 text-center
-          bg-gradient-to-t from-black/40 via-transparent to-black/40
-          sm:bg-gradient-to-t sm:from-black/80 sm:via-black/40 sm:to-black/80
-          sm:hover:from-transparent sm:hover:via-transparent sm:hover:to-transparent
-          z-20 transition-all duration-700 cursor-pointer">
+        <div className="group absolute inset-0 flex flex-col items-center justify-center overflow-hidden p-4 md:p-8 text-center bg-gradient-to-t from-black/40 via-transparent to-black/40 sm:bg-gradient-to-t sm:from-black/80 sm:via-black/40 sm:to-black/80 sm:hover:from-transparent sm:hover:via-transparent sm:hover:to-transparent z-20 transition-all duration-700 cursor-pointer">
 
           {/* Title - OUR WORK */}
-          <div className="
-            absolute pointer-events-none flex gap-1 sm:gap-2
-            top-2 left-2 scale-[0.35] origin-top-left
-            sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-[120%] sm:scale-100
-            sm:group-hover:top-4 sm:group-hover:left-4 sm:group-hover:-translate-x-0 sm:group-hover:-translate-y-0 sm:group-hover:scale-[0.4]
-            sm:transition-all sm:duration-700 sm:origin-top-left sm:ease-in-out
-          ">
+          <div className="absolute pointer-events-none flex gap-1 sm:gap-2 top-2 left-2 scale-[0.35] origin-top-left sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-[120%] sm:scale-100 sm:group-hover:top-4 sm:group-hover:left-4 sm:group-hover:-translate-x-0 sm:group-hover:-translate-y-0 sm:group-hover:scale-[0.4] sm:transition-all sm:duration-700 sm:origin-top-left sm:ease-in-out">
             {"OUR WORK".split("").map((char, i) => (
               <motion.span
                 key={i}
@@ -161,13 +151,7 @@ export default function HeroSection({ logos = [] }: Props) {
           </div>
 
           {/* Subtitle - We innovate your vision */}
-          <div className="
-            absolute pointer-events-none mt-4
-            bottom-2 right-2 scale-[0.55] origin-bottom-right
-            sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:right-auto sm:-translate-x-1/2 sm:translate-y-[20%] sm:scale-100
-            sm:group-hover:top-auto sm:group-hover:bottom-4 sm:group-hover:right-4 sm:group-hover:left-auto sm:group-hover:translate-x-0 sm:group-hover:translate-y-0 sm:group-hover:scale-[0.6]
-            sm:transition-all sm:duration-700 sm:origin-bottom-right sm:ease-in-out
-          ">
+          <div className="absolute pointer-events-none mt-4 bottom-2 right-2 scale-[0.55] origin-bottom-right sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:right-auto sm:-translate-x-1/2 sm:translate-y-[20%] sm:scale-100 sm:group-hover:top-auto sm:group-hover:bottom-4 sm:group-hover:right-4 sm:group-hover:left-auto sm:group-hover:translate-x-0 sm:group-hover:translate-y-0 sm:group-hover:scale-[0.6] sm:transition-all sm:duration-700 sm:origin-bottom-right sm:ease-in-out">
             <motion.div
               initial={{ opacity: 0, scale: 0.8, filter: "blur(5px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}

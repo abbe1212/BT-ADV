@@ -10,6 +10,8 @@ import { useConfirm } from "@/providers/ConfirmProvider";
 
 interface MessagesPageProps {
   initialMessages: ContactMessage[];
+  /** Total row count from DB (may be larger than initialMessages.length when paginated). */
+  totalCount?: number;
 }
 
 function formatDate(dateString: string): string {
@@ -32,7 +34,7 @@ function formatDateShort(dateString: string): string {
   });
 }
 
-export function MessagesPage({ initialMessages }: MessagesPageProps) {
+export function MessagesPage({ initialMessages, totalCount }: MessagesPageProps) {
   const [messages, setMessages] = useState<ContactMessage[]>(initialMessages);
   const [activeTab, setActiveTab] = useState("all");
   const [activeMessageId, setActiveMessageId] = useState<string | null>(
@@ -126,6 +128,9 @@ export function MessagesPage({ initialMessages }: MessagesPageProps) {
               <span className="bg-yellow text-navy text-xs px-2 py-0.5 rounded-full">{unreadCount} New</span>
             )}
           </h2>
+          {totalCount !== undefined && totalCount > messages.length && (
+            <p className="text-xs text-white/40 mt-1">Showing {messages.length} of {totalCount} messages</p>
+          )}
         </div>
       </div>
 

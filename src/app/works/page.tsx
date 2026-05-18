@@ -29,16 +29,20 @@ export default async function WorksPage() {
           <StarField count={200} />
         </div>
 
-        {/* Showreel video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-          src="/Ads images/BT_Website V04 (NFull).mp4"
-        />
+        {/* ── Showreel — YouTube background embed ────────────────────────────
+            YouTube CDN serves the video — zero Vercel bandwidth cost.
+            Set NEXT_PUBLIC_HERO_VIDEO_ID in Vercel env vars to your YouTube video ID
+            (the part after youtu.be/ or ?v=). */}
+        {process.env.NEXT_PUBLIC_HERO_VIDEO_ID && (
+          <iframe
+            className="absolute inset-0 w-full h-full pointer-events-none opacity-30"
+            style={{ border: 'none' }}
+            src={`https://www.youtube.com/embed/${process.env.NEXT_PUBLIC_HERO_VIDEO_ID}?autoplay=1&mute=1&loop=1&playlist=${process.env.NEXT_PUBLIC_HERO_VIDEO_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
+            allow="autoplay; encrypted-media"
+            aria-hidden="true"
+            title="BT Agency Showreel"
+          />
+        )}
 
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-navy/60 z-10" />

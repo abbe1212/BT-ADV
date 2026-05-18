@@ -60,10 +60,32 @@ function getTicketDate(dateStr?: string) {
   }
 }
 
+/* ─── HTML sanitizer (P2.17) ─────────────────────────────────────────────────*/
+/**
+ * Escapes user-supplied strings before interpolating them into email HTML.
+ * Prevents XSS in email clients that render raw HTML without sandboxing.
+ */
+function escapeHtml(str: string | undefined | null): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 /* ─── Shared ticket HTML ─────────────────────────────────────────────────────*/
 function ticketBlock(name: string, date: string | undefined, time_slot: string, type: string, budget: string, refCode: string) {
   const d = getTicketDate(date);
-  const typeLabel = type.replace('onsite', 'On-Site').replace('phone', 'Phone Call').replace('zoom', 'Zoom').toUpperCase();
+  const typeLabel = escapeHtml(type.replace('onsite', 'On-Site').replace('phone', 'Phone Call').replace('zoom', 'Zoom').toUpperCase());
+  const safeName     = escapeHtml(name);
+  const safeSlot     = escapeHtml(time_slot);
+  const safeBudget   = escapeHtml(budget);
+  const safeRefCode  = escapeHtml(refCode);
+  const safeDay      = escapeHtml(d.day);
+  const safeMonth    = escapeHtml(d.month);
+  const safeYear     = escapeHtml(d.year);
 
   return `
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:32px 0;">
@@ -80,7 +102,7 @@ function ticketBlock(name: string, date: string | undefined, time_slot: string, 
               <tr>
                 <td style="width:40%;vertical-align:top;padding-right:10px;">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">PASSENGER</p>
-                  <p style="margin:0;font-size:15px;font-weight:800;color:#00203c;text-transform:uppercase;">${name}</p>
+                  <p style="margin:0;font-size:15px;font-weight:800;color:#00203c;text-transform:uppercase;">${safeName}</p>
                 </td>
                 <td style="width:30%;vertical-align:top;padding:0 10px;border-left:2px dashed rgba(0,32,60,0.3);">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">SESSION</p>
@@ -88,7 +110,7 @@ function ticketBlock(name: string, date: string | undefined, time_slot: string, 
                 </td>
                 <td style="width:30%;vertical-align:top;padding-left:10px;border-left:2px dashed rgba(0,32,60,0.3);">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">BUDGET</p>
-                  <p style="margin:0;font-size:15px;font-weight:900;color:#00203c;text-transform:uppercase;">${budget}</p>
+                  <p style="margin:0;font-size:15px;font-weight:900;color:#00203c;text-transform:uppercase;">${safeBudget}</p>
                 </td>
               </tr>
             </table>
@@ -96,20 +118,20 @@ function ticketBlock(name: string, date: string | undefined, time_slot: string, 
               <tr>
                 <td style="width:33%;vertical-align:top;">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">DATE</p>
-                  <p style="margin:0;font-size:22px;font-weight:900;color:#00203c;line-height:1;">${d.day}</p>
-                  <p style="margin:0;font-size:11px;font-weight:700;color:#00203c;text-transform:uppercase;">${d.month} ${d.year}</p>
+                  <p style="margin:0;font-size:22px;font-weight:900;color:#00203c;line-height:1;">${safeDay}</p>
+                  <p style="margin:0;font-size:11px;font-weight:700;color:#00203c;text-transform:uppercase;">${safeMonth} ${safeYear}</p>
                 </td>
                 <td style="width:33%;vertical-align:top;padding-left:10px;border-left:2px dashed rgba(0,32,60,0.4);">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">TIME</p>
-                  <p style="margin:0;font-size:28px;font-weight:900;color:#00203c;line-height:1;letter-spacing:2px;">${time_slot}</p>
+                  <p style="margin:0;font-size:28px;font-weight:900;color:#00203c;line-height:1;letter-spacing:2px;">${safeSlot}</p>
                 </td>
                 <td style="width:34%;vertical-align:top;padding-left:10px;border-left:2px dashed rgba(0,32,60,0.4);">
                   <p style="margin:0;font-size:9px;letter-spacing:3px;color:#00203c;opacity:0.6;text-transform:uppercase;margin-bottom:4px;">REF CODE</p>
-                  <p style="margin:0;font-size:11px;font-weight:900;color:#00203c;">${refCode}</p>
+                  <p style="margin:0;font-size:11px;font-weight:900;color:#00203c;">${safeRefCode}</p>
                 </td>
               </tr>
             </table>
-            <p style="margin:0;font-size:9px;letter-spacing:2px;color:#00203c;opacity:0.55;text-transform:uppercase;">Our team will confirm shortly — BT-ADV © ${d.year}</p>
+            <p style="margin:0;font-size:9px;letter-spacing:2px;color:#00203c;opacity:0.55;text-transform:uppercase;">Our team will confirm shortly — BT-ADV © ${safeYear}</p>
           </td>
           <td style="width:180px;padding:24px 16px;vertical-align:middle;text-align:center;background:rgba(0,32,60,0.08);">
             <p style="margin:0 0 12px 0;font-size:9px;letter-spacing:4px;color:#00203c;opacity:0.6;text-transform:uppercase;">✂ TEAR HERE</p>
@@ -121,7 +143,7 @@ function ticketBlock(name: string, date: string | undefined, time_slot: string, 
             <p style="margin:0;font-size:26px;font-weight:900;color:#00203c;">A1</p>
             <div style="height:2px;background:rgba(0,32,60,0.2);margin:14px 0;"></div>
             <div style="font-family:monospace;font-size:5px;color:#00203c;opacity:0.5;letter-spacing:1px;word-break:break-all;max-width:120px;margin:auto;line-height:1.6;">
-              ||||| |||| ||||| ||| ||||| ||<br/>${refCode}<br/>||||| |||| ||||| ||| |||||
+              ||||| |||| ||||| ||| ||||| ||<br/>${safeRefCode}<br/>||||| |||| ||||| ||| |||||
             </div>
           </td>
         </tr>
@@ -132,12 +154,26 @@ function ticketBlock(name: string, date: string | undefined, time_slot: string, 
 }
 
 function detailRow(label: string, value: string) {
+  const safeLabel = escapeHtml(label);
+  const safeValue = escapeHtml(value);
   return `<tr>
     <td style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);width:38%;vertical-align:top;">
-      <span style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;">${label}</span>
+      <span style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;">${safeLabel}</span>
     </td>
     <td style="padding:7px 0 7px 16px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top;">
-      <span style="font-size:13px;color:#ffffff;font-weight:600;">${value}</span>
+      <span style="font-size:13px;color:#ffffff;font-weight:600;">${safeValue}</span>
+    </td>
+  </tr>`;
+}
+
+function detailRowHtml(label: string, rawHtml: string) {
+  const safeLabel = escapeHtml(label);
+  return `<tr>
+    <td style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);width:38%;vertical-align:top;">
+      <span style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;">${safeLabel}</span>
+    </td>
+    <td style="padding:7px 0 7px 16px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top;">
+      <span style="font-size:13px;color:#ffffff;font-weight:600;">${rawHtml}</span>
     </td>
   </tr>`;
 }
@@ -301,7 +337,7 @@ export async function POST(req: Request) {
         </td></tr>
         <tr><td style="padding:0 20px 4px;">
           <p style="margin:0;font-size:16px;color:rgba(255,255,255,0.85);line-height:1.7;">
-            Hi <strong style="color:#e8c35e;">${name}</strong>,<br>
+            Hi <strong style="color:#e8c35e;">${escapeHtml(name)}</strong>,<br>
             Your booking has been <strong style="color:#e8c35e;">received</strong>. Our team will contact you shortly.
           </p>
         </td></tr>
@@ -338,8 +374,8 @@ export async function POST(req: Request) {
               <p style="margin:0 0 14px;font-size:11px;letter-spacing:4px;color:#e8c35e;text-transform:uppercase;">Client Information</p>
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${detailRow('Name', name)}
-                ${detailRow('Email', `<a href="mailto:${email}" style="color:#e8c35e;text-decoration:none;">${email}</a>`)}
-                ${detailRow('Phone', `<a href="tel:${phone}" style="color:#e8c35e;text-decoration:none;">${phone}</a>`)}
+                ${detailRowHtml('Email', `<a href="mailto:${escapeHtml(email)}" style="color:#e8c35e;text-decoration:none;">${escapeHtml(email)}</a>`)}
+                ${detailRowHtml('Phone', `<a href="tel:${escapeHtml(phone)}" style="color:#e8c35e;text-decoration:none;">${escapeHtml(phone)}</a>`)}
                 ${detailRow('Budget', budget)}
                 ${detailRow('Type', type.replace('onsite','On-Site').replace('phone','Phone Call').toUpperCase())}
                 ${detailRow('Date & Time', `${date} at ${time_slot}`)}
@@ -349,7 +385,7 @@ export async function POST(req: Request) {
           </table>
         </td></tr>
         <tr><td align="center" style="padding:0 20px 32px;">
-          <a href="mailto:${email}" style="display:inline-block;background:#e8c35e;color:#00203c;font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;border-radius:8px;text-decoration:none;">Reply to Client</a>
+          <a href="mailto:${escapeHtml(email)}" style="display:inline-block;background:#e8c35e;color:#00203c;font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;border-radius:8px;text-decoration:none;">Reply to Client</a>
         </td></tr>`);
 
       await Promise.allSettled([

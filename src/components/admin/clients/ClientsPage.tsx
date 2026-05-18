@@ -379,11 +379,12 @@ export function ClientsPage({ initialClients }: ClientsPageProps) {
                  <label className="text-sm font-bold text-white">Logo</label>
                  <MediaUploader
                    accept="image"
-                   folder="bt-agency/clients"
+                   uploadMode="logo"
+                   slug={formData.slug || 'client'}
                    defaultUrl={formData.logo_url}
                    onUpload={(url) => setFormData(prev => ({ ...prev, logo_url: url }))}
                    onRemove={() => setFormData(prev => ({ ...prev, logo_url: '' }))}
-                   label="Drop client logo here"
+                   label="Drop client logo here · auto-converted to WebP"
                  />
                  <p className="text-xs text-white/40">PNG with transparent background recommended · max 10 MB</p>
                </div>

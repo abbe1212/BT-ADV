@@ -1,9 +1,19 @@
 import { notFound } from "next/navigation";
-import { getWorkById, getNextWork } from "@/lib/supabase/queries";
+import { getWorkById, getNextWork, getWorks } from "@/lib/supabase/queries";
 import WorkDetailClient from "@/components/works/WorkDetailClient";
 
 export const revalidate = 3600; // Revalidate every hour; individual work detail pages
-export const dynamicParams = true;
+export const dynamicParams = true; // Allow new works added after build to be rendered on-demand
+
+/**
+ * [P2.14] Pre-render all current works at build time.
+ * New works added via the admin dashboard will be served on-demand (dynamicParams=true)
+ * and then cached in the ISR store for subsequent requests.
+ */
+export async function generateStaticParams() {
+  const works = await getWorks();
+  return works.map((work) => ({ id: work.id }));
+}
 
 interface Props {
   params: Promise<{ id: string }>;
