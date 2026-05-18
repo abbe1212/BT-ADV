@@ -25,6 +25,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { getCsrfToken } from '@/lib/csrf-client';
 
 /* ─── Types ──────────────────────────────────────────────────────────────────*/
 
@@ -218,8 +219,10 @@ export default function MediaUploader({
       // Animate progress bar
       const tick = setInterval(() => setProgress(p => Math.min(p + 7, 85)), 300);
 
+      const csrfToken = getCsrfToken();
       const res = await fetch(buildEndpoint(uploadMode), {
         method: 'POST',
+        headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
         body: fd,
       });
 

@@ -41,8 +41,9 @@ const SECURITY_HEADERS = [
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://res.cloudinary.com https://*.supabase.co https://*.supabase.in https://img.youtube.com",
       "media-src 'self' https://res.cloudinary.com",
-      // Sentry ingest must be in connect-src so error reports are not blocked
-      "connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.upstash.io https://*.ingest.sentry.io",
+      // Supabase Realtime uses WebSocket — wss:// must be explicitly allowed
+      // Turbopack hot-reload uses ws://localhost in dev
+      `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://*.upstash.io https://*.ingest.sentry.io${isDev ? ' ws://localhost:*' : ''}`,
       // YouTube iframe for the hero showreel
       "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
       "frame-ancestors 'none'",
@@ -136,10 +137,11 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.supabase.in" },
 
       // Cloudinary delivery — logos, works, and any transformed assets
+      // pathname is intentionally unrestricted: allows any cloud account
+      // (needed if the project migrates between Cloudinary accounts)
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/dgwo2z3py/**",  // scoped to our cloud name
       },
     ],
     // Serve AVIF first (smallest), fall back to WebP, then original

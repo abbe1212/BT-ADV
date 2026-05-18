@@ -22,6 +22,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2, Link } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { getCsrfToken } from '@/lib/csrf-client';
 
 /* ─── Validation ─────────────────────────────────────────────────────────────*/
 
@@ -92,7 +93,11 @@ export function ImageUploadInput({
         formData.append('file', file);
         formData.append('folder', resolvedFolder);
 
-        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'x-csrf-token': getCsrfToken() },
+          body: formData,
+        });
         if (!res.ok) {
           const body = await res.json().catch(() => ({})) as { error?: string };
           throw new Error(body?.error ?? `Upload failed (${res.status})`);

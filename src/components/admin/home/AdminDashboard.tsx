@@ -115,7 +115,7 @@ export function AdminDashboard({ stats: initialStats, recentBookings: initialBoo
     <div className="space-y-6">
       {/* ROW 1: Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        <StatCard icon={CalendarDays} number={stats.totalBookings.toLocaleString()} labelAR="إجمالي الحجوزات" labelEN="Total Bookings" />
+        <StatCard icon={CalendarDays} number={String(stats.totalBookings)} labelAR="إجمالي الحجوزات" labelEN="Total Bookings" />
         <StatCard icon={AlertCircle} number={stats.pendingBookings.toString()} labelAR="حجوزات معلقة" labelEN="Pending Bookings" iconColor="text-amber-400" />
         <StatCard icon={TrendingUp} number={monthlyChangeStr} labelAR="الشهر الحالي" labelEN="This Month" />
         <StatCard icon={Mail} number={stats.newMessages.toString()} labelAR="رسائل جديدة" labelEN="New Messages" hasIndicator={stats.newMessages > 0} />
