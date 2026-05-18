@@ -6,10 +6,7 @@ export const revalidate = 3600; // Revalidate every hour; individual work detail
 export const dynamicParams = true; // Allow new works added after build to be rendered on-demand
 
 /**
- * [P2.14] Pre-render all current works at build time.
- * New works added via the admin dashboard will be served on-demand (dynamicParams=true)
- * and then cached in the ISR store for subsequent requests.
- *
+
  * Fails gracefully when Supabase env vars are not available at build time
  * (e.g. Vercel preview deployments without secrets). dynamicParams=true means
  * every /works/[id] page still works — just rendered on first request.
