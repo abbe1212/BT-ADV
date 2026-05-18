@@ -9,10 +9,19 @@ export const dynamicParams = true; // Allow new works added after build to be re
  * [P2.14] Pre-render all current works at build time.
  * New works added via the admin dashboard will be served on-demand (dynamicParams=true)
  * and then cached in the ISR store for subsequent requests.
+ *
+ * Fails gracefully when Supabase env vars are not available at build time
+ * (e.g. Vercel preview deployments without secrets). dynamicParams=true means
+ * every /works/[id] page still works — just rendered on first request.
  */
 export async function generateStaticParams() {
-  const works = await getWorks();
-  return works.map((work) => ({ id: work.id }));
+  try {
+    const works = await getWorks();
+    return works.map((work) => ({ id: work.id }));
+  } catch {
+    // Build env missing Supabase vars — skip pre-rendering, rely on dynamicParams
+    return [];
+  }
 }
 
 interface Props {
